@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>관리자 - 서버 출입 대장</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<main class="page-shell wide">
+    <header class="top-bar">
+        <div>
+            <p class="eyebrow">Admin</p>
+            <h1>출입 기록</h1>
+        </div>
+        <div class="header-actions">
+            <a class="button-link secondary" th:href="@{/}">입력 화면</a>
+            <a class="button-link" th:href="@{/admin/excel}">엑셀 출력</a>
+        </div>
+    </header>
+
+    <section class="table-wrap">
+        <table>
+            <thead>
+            <tr>
+                <th>번호</th>
+                <th>상호명</th>
+                <th>이름</th>
+                <th>출입 시간</th>
+                <th>내용</th>
+                <th>PDF</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:if="${#lists.isEmpty(accessLogs)}">
+                <td colspan="6" class="empty">저장된 기록이 없습니다.</td>
+            </tr>
+            <tr th:each="log : ${accessLogs}">
+                <td th:text="${log.id}"></td>
+                <td th:text="${log.companyName}"></td>
+                <td th:text="${log.visitorName}"></td>
+                <td th:text="${#temporals.format(log.visitedAt, 'yyyy-MM-dd HH:mm')}"></td>
+                <td class="content-cell" th:text="${log.content}"></td>
+                <td><a th:href="@{/admin/{id}/pdf(id=${log.id})}">다운로드</a></td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+</main>
+</body>
+</html>

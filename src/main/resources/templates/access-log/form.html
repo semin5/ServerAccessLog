@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>서버 출입 대장</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<main class="page-shell">
+    <header class="top-bar">
+        <div>
+            <p class="eyebrow">Server Access Log</p>
+            <h1>서버 출입 대장</h1>
+        </div>
+        <a class="quiet-link" th:href="@{/admin}">관리자</a>
+    </header>
+
+    <form class="entry-form" th:action="@{/access-logs}" th:object="${accessLogForm}" method="post" enctype="multipart/form-data">
+        <div class="form-alert" th:if="${#fields.hasGlobalErrors()}">
+            <p th:each="error : ${#fields.globalErrors()}" th:text="${error}"></p>
+        </div>
+        <div class="form-grid">
+            <label>
+                <span>상호명</span>
+                <input th:field="*{companyName}" autocomplete="organization">
+                <small th:errors="*{companyName}"></small>
+            </label>
+            <label>
+                <span>이름</span>
+                <input th:field="*{visitorName}" autocomplete="name">
+                <small th:errors="*{visitorName}"></small>
+            </label>
+            <label>
+                <span>연락처</span>
+                <input th:field="*{contact}" inputmode="tel" autocomplete="tel">
+                <small th:errors="*{contact}"></small>
+            </label>
+            <label>
+                <span>담당자</span>
+                <input th:field="*{hostName}">
+                <small th:errors="*{hostName}"></small>
+            </label>
+            <label>
+                <span>서버명</span>
+                <input th:field="*{serverName}">
+                <small th:errors="*{serverName}"></small>
+            </label>
+            <label>
+                <span>출입 시간</span>
+                <input type="datetime-local" th:field="*{visitedAt}">
+                <small th:errors="*{visitedAt}"></small>
+            </label>
+        </div>
+
+        <label class="wide-field">
+            <span>내용</span>
+            <textarea th:field="*{content}" rows="5"></textarea>
+            <small th:errors="*{content}"></small>
+        </label>
+
+        <section class="signature-panel">
+            <div class="section-heading">
+                <h2>서명</h2>
+                <button class="icon-button" type="button" id="clearSignature" aria-label="서명 지우기" title="서명 지우기">↺</button>
+            </div>
+            <canvas id="signatureCanvas" width="900" height="320"></canvas>
+            <input type="hidden" th:field="*{signatureData}" id="signatureData">
+            <div class="file-row">
+                <label class="file-button">
+                    JPG 선택
+                    <input type="file" th:field="*{signatureFile}" accept="image/jpeg">
+                </label>
+                <small th:errors="*{signatureData}"></small>
+            </div>
+        </section>
+
+        <div class="actions">
+            <button type="submit">전송</button>
+        </div>
+    </form>
+</main>
+<script th:src="@{/js/signature.js}"></script>
+</body>
+</html>
