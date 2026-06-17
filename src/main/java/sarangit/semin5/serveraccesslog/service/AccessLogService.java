@@ -2,6 +2,7 @@ package sarangit.semin5.serveraccesslog.service;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -11,6 +12,8 @@ import sarangit.semin5.serveraccesslog.web.AccessLogForm;
 
 @Service
 public class AccessLogService {
+
+    private static final List<String> EXIT_GUIDE_NAMES = List.of("김재현 팀장", "강성구 사원", "오세민 사원", "최인호 사원");
 
     private final AccessLogRepository accessLogRepository;
     private final PdfService pdfService;
@@ -28,15 +31,16 @@ public class AccessLogService {
 
     @Transactional
     public AccessLog create(AccessLogForm form) {
-        SignatureImage signatureImage = signatureImageService.extract(form);
+        SignatureImage signatureImage = signatureImageService.extractRequired(form);
         byte[] pdfBytes = pdfService.createAccessLogPdf(form, signatureImage.bytes());
 
         AccessLog accessLog = new AccessLog(
                 form.getCompanyName(),
                 form.getVisitorName(),
-                form.getContact(),
-                form.getHostName(),
-                form.getServerName(),
+                form.getBirthDate(),
+                null,
+                null,
+                null,
                 form.getVisitedAt(),
                 form.getContent(),
                 signatureImage.fileName(),
@@ -45,6 +49,44 @@ public class AccessLogService {
                 pdfBytes
         );
         return accessLogRepository.save(accessLog);
+    }
+
+    @Transactional
+    public AccessLog update(Long id, AccessLogForm form) {
+        AccessLog accessLog = get(id);
+        Optional<SignatureImage> newSignature = signatureImageService.extractOptional(form);
+        byte[] signatureBytes = newSignature.map(SignatureImage::bytes).orElse(accessLog.getSignatureImage());
+        String signatureFileName = newSignature.map(SignatureImage::fileName).orElse(accessLog.getSignatureFileName());
+        String signatureContentType = newSignature.map(SignatureImage::contentType).orElse(accessLog.getSignatureContentType());
+        byte[] pdfBytes = pdfService.createAccessLogPdf(form, signatureBytes);
+
+        accessLog.update(
+                form.getCompanyName(),
+                form.getVisitorName(),
+                form.getBirthDate(),
+                null,
+                null,
+                null,
+                form.getVisitedAt(),
+                form.getContent(),
+                signatureFileName,
+                signatureContentType,
+                signatureBytes,
+                pdfBytes
+        );
+        return accessLog;
+    }
+
+    @Transactional
+    public void checkout(Long id, String exitGuideName) {
+        if (!EXIT_GUIDE_NAMES.contains(exitGuideName)) {
+            throw new IllegalArgumentException("안내자를 선택해주세요.");
+        }
+        get(id).checkout(exitGuideName);
+    }
+
+    public List<String> exitGuideNames() {
+        return EXIT_GUIDE_NAMES;
     }
 
     @Transactional(readOnly = true)
@@ -64,12 +106,20 @@ public class AccessLogService {
     @Service
     static class SignatureImageService {
 
-        SignatureImage extract(AccessLogForm form) {
+        SignatureImage extractRequired(AccessLogForm form) {
+            return extractOptional(form)
+                    .orElseThrow(() -> new IllegalArgumentException("서명이 필요합니다."));
+        }
+
+        Optional<SignatureImage> extractOptional(AccessLogForm form) {
             MultipartFile file = form.getSignatureFile();
             if (file != null && !file.isEmpty()) {
-                return extractFile(file);
+                return Optional.of(extractFile(file));
             }
-            return extractDataUrl(form.getSignatureData());
+            if (form.getSignatureData() != null && !form.getSignatureData().isBlank()) {
+                return Optional.of(extractDataUrl(form.getSignatureData()));
+            }
+            return Optional.empty();
         }
 
         private SignatureImage extractFile(MultipartFile file) {
@@ -85,9 +135,6 @@ public class AccessLogService {
         }
 
         private SignatureImage extractDataUrl(String signatureData) {
-            if (signatureData == null || signatureData.isBlank()) {
-                throw new IllegalArgumentException("서명이 필요합니다.");
-            }
             String prefix = "data:image/png;base64,";
             if (!signatureData.startsWith(prefix)) {
                 throw new IllegalArgumentException("서명 이미지 형식이 올바르지 않습니다.");

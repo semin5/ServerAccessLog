@@ -19,6 +19,7 @@ import sarangit.semin5.serveraccesslog.web.AccessLogForm;
 @Service
 public class PdfService {
 
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
     public byte[] createAccessLogPdf(AccessLogForm form, byte[] signatureImage) {
@@ -31,13 +32,11 @@ public class PdfService {
             try (PDPageContentStream content = new PDPageContentStream(document, page)) {
                 drawTitle(content, font);
                 float y = 720;
-                y = drawRow(content, font, y, "상호명", form.getCompanyName());
-                y = drawRow(content, font, y, "이름", form.getVisitorName());
-                y = drawRow(content, font, y, "연락처", value(form.getContact()));
-                y = drawRow(content, font, y, "담당자", value(form.getHostName()));
-                y = drawRow(content, font, y, "서버명", value(form.getServerName()));
+                y = drawRow(content, font, y, "소속", form.getCompanyName());
+                y = drawRow(content, font, y, "성명", form.getVisitorName());
+                y = drawRow(content, font, y, "생년월일", form.getBirthDate().format(DATE_FORMATTER));
                 y = drawRow(content, font, y, "출입 시간", form.getVisitedAt().format(DATE_TIME_FORMATTER));
-                y = drawMultilineRow(content, font, y, "내용", form.getContent());
+                y = drawMultilineRow(content, font, y, "출입사유", form.getContent());
                 drawSignature(content, font, signature, y - 18, form.getVisitorName());
             }
 

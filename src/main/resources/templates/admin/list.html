@@ -19,29 +19,53 @@
         </div>
     </header>
 
+    <p class="notice" th:if="${message}" th:text="${message}"></p>
+
     <section class="table-wrap">
         <table>
             <thead>
             <tr>
                 <th>번호</th>
-                <th>상호명</th>
-                <th>이름</th>
+                <th>소속</th>
+                <th>성명</th>
+                <th>생년월일</th>
                 <th>출입 시간</th>
-                <th>내용</th>
-                <th>PDF</th>
+                <th>퇴실 시간</th>
+                <th>출입사유</th>
+                <th>서명</th>
+                <th>관리</th>
             </tr>
             </thead>
             <tbody>
             <tr th:if="${#lists.isEmpty(accessLogs)}">
-                <td colspan="6" class="empty">저장된 기록이 없습니다.</td>
+                <td colspan="9" class="empty">저장된 기록이 없습니다.</td>
             </tr>
             <tr th:each="log : ${accessLogs}">
                 <td th:text="${log.id}"></td>
                 <td th:text="${log.companyName}"></td>
                 <td th:text="${log.visitorName}"></td>
+                <td th:text="${log.birthDate == null ? '' : #temporals.format(log.birthDate, 'yyyy-MM-dd')}"></td>
                 <td th:text="${#temporals.format(log.visitedAt, 'yyyy-MM-dd HH:mm')}"></td>
+                <td>
+                    <div class="checkout-done" th:if="${log.exitedAt != null}">
+                        <strong th:text="${#temporals.format(log.exitedAt, 'yyyy-MM-dd HH:mm')}"></strong>
+                        <span th:text="${log.exitGuideName}"></span>
+                    </div>
+                    <form class="checkout-form" th:if="${log.exitedAt == null}" th:action="@{/admin/{id}/checkout(id=${log.id})}" method="post">
+                        <select name="exitGuideName" required>
+                            <option value="">안내자 선택</option>
+                            <option th:each="guide : ${exitGuideNames}" th:value="${guide}" th:text="${guide}"></option>
+                        </select>
+                        <button type="submit">퇴실</button>
+                    </form>
+                </td>
                 <td class="content-cell" th:text="${log.content}"></td>
-                <td><a th:href="@{/admin/{id}/pdf(id=${log.id})}">다운로드</a></td>
+                <td>
+                    <img class="signature-thumb" th:src="@{/admin/{id}/signature(id=${log.id})}" alt="서명">
+                </td>
+                <td>
+                    <a class="table-action" th:href="@{/admin/{id}/edit(id=${log.id})}">수정</a>
+                </td>
             </tr>
             </tbody>
         </table>

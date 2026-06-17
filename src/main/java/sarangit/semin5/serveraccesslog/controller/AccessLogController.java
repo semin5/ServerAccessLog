@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import sarangit.semin5.serveraccesslog.domain.AccessLog;
 import sarangit.semin5.serveraccesslog.service.AccessLogExcelService;
@@ -47,7 +48,10 @@ public class AccessLogController {
             RedirectAttributes redirectAttributes
     ) {
         if (!accessLogForm.hasSignature()) {
-            bindingResult.rejectValue("signatureData", "signature.required", "서명을 그리거나 JPG 파일을 올려주세요.");
+            bindingResult.rejectValue("signatureData", "signature.required", "서명을 입력해주세요.");
+        }
+        if (!accessLogForm.isPrivacyAgreed()) {
+            bindingResult.rejectValue("privacyAgreed", "privacy.required", "개인정보 수집 및 이용에 동의해주세요.");
         }
         if (bindingResult.hasErrors()) {
             return "access-log/form";
@@ -73,7 +77,58 @@ public class AccessLogController {
     @GetMapping("/admin")
     public String admin(Model model) {
         model.addAttribute("accessLogs", accessLogService.findAll());
+        model.addAttribute("exitGuideNames", accessLogService.exitGuideNames());
         return "admin/list";
+    }
+
+    @GetMapping("/admin/{id}/edit")
+    public String edit(@PathVariable Long id, Model model) {
+        AccessLog accessLog = accessLogService.get(id);
+        if (!model.containsAttribute("accessLogForm")) {
+            model.addAttribute("accessLogForm", AccessLogForm.from(accessLog));
+        }
+        model.addAttribute("accessLog", accessLog);
+        return "admin/edit";
+    }
+
+    @PostMapping("/admin/{id}/edit")
+    public String update(
+            @PathVariable Long id,
+            @Valid @ModelAttribute AccessLogForm accessLogForm,
+            BindingResult bindingResult,
+            Model model,
+            RedirectAttributes redirectAttributes
+    ) {
+        AccessLog accessLog = accessLogService.get(id);
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("accessLog", accessLog);
+            return "admin/edit";
+        }
+
+        try {
+            accessLogService.update(id, accessLogForm);
+        } catch (IllegalArgumentException e) {
+            bindingResult.reject("accessLog.invalid", e.getMessage());
+            model.addAttribute("accessLog", accessLog);
+            return "admin/edit";
+        }
+        redirectAttributes.addFlashAttribute("message", "출입 기록이 수정되었습니다.");
+        return "redirect:/admin";
+    }
+
+    @PostMapping("/admin/{id}/checkout")
+    public String checkout(
+            @PathVariable Long id,
+            @RequestParam String exitGuideName,
+            RedirectAttributes redirectAttributes
+    ) {
+        try {
+            accessLogService.checkout(id, exitGuideName);
+            redirectAttributes.addFlashAttribute("message", "퇴실 처리되었습니다.");
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("message", e.getMessage());
+        }
+        return "redirect:/admin";
     }
 
     @GetMapping("/admin/excel")
@@ -88,17 +143,11 @@ public class AccessLogController {
                 .body(bytes);
     }
 
-    @GetMapping("/admin/{id}/pdf")
-    public ResponseEntity<byte[]> pdf(@PathVariable Long id) {
+    @GetMapping("/admin/{id}/signature")
+    public ResponseEntity<byte[]> signature(@PathVariable Long id) {
         AccessLog accessLog = accessLogService.get(id);
-        String filename = "server-access-log-" + accessLog.getId() + ".pdf";
         return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, ContentDisposition.attachment()
-                        .filename(filename)
-                        .build()
-                        .toString())
-                .contentType(MediaType.APPLICATION_PDF)
-                .body(accessLog.getPdfFile());
+                .contentType(MediaType.parseMediaType(accessLog.getSignatureContentType()))
+                .body(accessLog.getSignatureImage());
     }
-
 }

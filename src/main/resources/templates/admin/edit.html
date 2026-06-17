@@ -3,32 +3,32 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>서버 출입 대장</title>
+    <title>출입 기록 수정</title>
     <link rel="stylesheet" th:href="@{/css/app.css}">
 </head>
 <body>
 <main class="page-shell">
     <header class="top-bar">
         <div>
-            <p class="eyebrow">Server Access Log</p>
-            <h1>서버 출입 대장</h1>
+            <p class="eyebrow">Admin</p>
+            <h1>출입 기록 수정</h1>
         </div>
-        <a class="quiet-link" th:href="@{/admin}">관리자</a>
+        <a class="quiet-link" th:href="@{/admin}">목록</a>
     </header>
 
-    <form class="entry-form" th:action="@{/access-logs}" th:object="${accessLogForm}" method="post" enctype="multipart/form-data">
+    <form class="entry-form" th:action="@{/admin/{id}/edit(id=${accessLog.id})}" th:object="${accessLogForm}" method="post" enctype="multipart/form-data">
         <div class="form-alert" th:if="${#fields.hasGlobalErrors()}">
             <p th:each="error : ${#fields.globalErrors()}" th:text="${error}"></p>
         </div>
         <div class="form-grid">
             <label>
                 <span>소속</span>
-                <input th:field="*{companyName}" autocomplete="organization">
+                <input th:field="*{companyName}">
                 <small th:errors="*{companyName}"></small>
             </label>
             <label>
                 <span>성명</span>
-                <input th:field="*{visitorName}" autocomplete="name">
+                <input th:field="*{visitorName}">
                 <small th:errors="*{visitorName}"></small>
             </label>
             <label>
@@ -52,32 +52,22 @@
         <section class="signature-panel">
             <div class="section-heading">
                 <h2>서명</h2>
-                <button class="icon-button" type="button" id="clearSignature" aria-label="서명 지우기" title="서명 지우기">↺</button>
+                <button class="icon-button" type="button" id="clearSignature" aria-label="새 서명 지우기" title="새 서명 지우기">↺</button>
+            </div>
+            <div class="current-signature">
+                <span>현재 서명</span>
+                <img th:src="@{/admin/{id}/signature(id=${accessLog.id})}" alt="현재 서명">
             </div>
             <canvas id="signatureCanvas" width="900" height="320"></canvas>
             <input type="hidden" th:field="*{signatureData}" id="signatureData">
-            <small th:errors="*{signatureData}"></small>
+            <div class="file-row">
+                <small>새 서명을 입력하지 않으면 기존 서명이 유지됩니다.</small>
+            </div>
         </section>
 
-        <section class="consent-panel">
-            <label class="check-line">
-                <input type="checkbox" th:field="*{privacyAgreed}">
-                <span>개인정보 수집 및 이용에 동의합니다.</span>
-            </label>
-            <small th:errors="*{privacyAgreed}"></small>
-            <details>
-                <summary>개인정보 동의 조항 보기</summary>
-                <div class="terms-box">
-                    <p>수집 항목: 소속, 성명, 생년월일, 출입 시간, 출입사유, 서명</p>
-                    <p>수집 목적: 서버실 출입 이력 관리, 보안 감사, 사고 발생 시 출입 사실 확인</p>
-                    <p>보관 기간: 회사 내부 보안 정책에 따른 보관 기간 동안 보관 후 파기</p>
-                    <p>동의를 거부할 수 있으나, 동의하지 않을 경우 서버실 출입 기록 등록이 제한될 수 있습니다.</p>
-                </div>
-            </details>
-        </section>
-
-        <div class="actions">
+        <div class="actions split">
             <button type="submit">저장</button>
+            <a class="button-link secondary" th:href="@{/admin}">취소</a>
         </div>
     </form>
 </main>

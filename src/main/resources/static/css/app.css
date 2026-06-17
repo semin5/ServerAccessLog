@@ -99,6 +99,16 @@ h2 {
     margin: 0;
 }
 
+.notice {
+    margin: 0 0 16px;
+    border: 1px solid #b8d8ce;
+    border-radius: 6px;
+    background: #eef8f4;
+    color: #176c5f;
+    padding: 12px 14px;
+    font-weight: 800;
+}
+
 label,
 .wide-field {
     display: grid;
@@ -137,6 +147,7 @@ small {
 
 .wide-field,
 .signature-panel,
+.consent-panel,
 .actions {
     margin-top: 22px;
 }
@@ -203,6 +214,55 @@ canvas {
     display: none;
 }
 
+.consent-panel {
+    border-top: 1px solid #e6ece8;
+    padding-top: 18px;
+}
+
+.check-line {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.check-line input {
+    width: 20px;
+    height: 20px;
+    flex: 0 0 auto;
+}
+
+.check-line span {
+    color: #172033;
+    font-size: 16px;
+}
+
+details {
+    margin-top: 10px;
+}
+
+summary {
+    color: #176c5f;
+    cursor: pointer;
+    font-weight: 800;
+}
+
+.terms-box {
+    margin-top: 10px;
+    border: 1px solid #d7e1dc;
+    border-radius: 6px;
+    background: #fbfdfc;
+    padding: 12px 14px;
+    color: #3f4b5b;
+}
+
+.terms-box p {
+    margin: 0 0 8px;
+}
+
+.terms-box p:last-child {
+    margin-bottom: 0;
+}
+
 button[type="submit"],
 .button-link {
     display: inline-flex;
@@ -258,6 +318,94 @@ th {
     text-overflow: ellipsis;
 }
 
+.signature-thumb {
+    display: block;
+    width: 140px;
+    height: 56px;
+    object-fit: contain;
+    border: 1px solid #d7e1dc;
+    border-radius: 6px;
+    background: #ffffff;
+}
+
+.table-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 36px;
+    padding: 0 12px;
+    border-radius: 6px;
+    background: #eef5f1;
+    color: #1c5e54;
+}
+
+.checkout-form {
+    display: grid;
+    grid-template-columns: minmax(130px, 1fr) auto;
+    gap: 8px;
+    align-items: center;
+    min-width: 230px;
+}
+
+.checkout-form select {
+    width: 100%;
+    min-height: 36px;
+    border: 1px solid #cbd7d1;
+    border-radius: 6px;
+    background: #ffffff;
+    color: #172033;
+    font: inherit;
+    padding: 0 8px;
+}
+
+.checkout-form button {
+    min-height: 36px;
+    border: 0;
+    border-radius: 6px;
+    background: #176c5f;
+    color: #ffffff;
+    font: inherit;
+    font-weight: 900;
+    padding: 0 12px;
+    cursor: pointer;
+}
+
+.checkout-done {
+    display: grid;
+    gap: 4px;
+    min-width: 150px;
+}
+
+.checkout-done strong {
+    font-size: 13px;
+}
+
+.checkout-done span {
+    color: #526172;
+    font-size: 13px;
+}
+
+.current-signature {
+    display: grid;
+    gap: 8px;
+    margin-top: 14px;
+}
+
+.current-signature span {
+    color: #3f4b5b;
+    font-size: 14px;
+    font-weight: 800;
+}
+
+.current-signature img {
+    width: min(320px, 100%);
+    height: 110px;
+    object-fit: contain;
+    border: 1px solid #d7e1dc;
+    border-radius: 6px;
+    background: #ffffff;
+}
+
 .empty {
     color: #697386;
     text-align: center;
@@ -265,6 +413,10 @@ th {
 
 .result-panel {
     width: min(560px, 100%);
+}
+
+.result-panel h1 {
+    font-size: clamp(24px, 4vw, 32px);
 }
 
 .result-panel p:not(.eyebrow) {

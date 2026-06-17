@@ -11,10 +11,8 @@
     <section class="result-panel">
         <p class="eyebrow">Saved</p>
         <h1>출입 기록이 저장되었습니다.</h1>
-        <p th:text="${accessLog.companyName + ' / ' + accessLog.visitorName}"></p>
-        <div class="actions split">
-            <a class="button-link" th:href="@{/admin/{id}/pdf(id=${accessLog.id})}">PDF 다운로드</a>
-            <a class="button-link secondary" th:href="@{/}">새로 작성</a>
+        <div class="actions">
+            <a class="button-link secondary" th:href="@{/}">돌아가기</a>
         </div>
     </section>
 </main>

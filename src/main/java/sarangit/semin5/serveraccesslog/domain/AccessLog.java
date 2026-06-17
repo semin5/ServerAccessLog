@@ -7,6 +7,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Lob;
 import jakarta.persistence.PrePersist;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -21,6 +22,9 @@ public class AccessLog {
 
     @Column(nullable = false, length = 50)
     private String visitorName;
+
+    @Column
+    private LocalDate birthDate;
 
     @Column(length = 50)
     private String contact;
@@ -44,12 +48,18 @@ public class AccessLog {
     private String signatureContentType;
 
     @Lob
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "LONGBLOB")
     private byte[] signatureImage;
 
     @Lob
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "LONGBLOB")
     private byte[] pdfFile;
+
+    @Column
+    private LocalDateTime exitedAt;
+
+    @Column(length = 50)
+    private String exitGuideName;
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -60,6 +70,7 @@ public class AccessLog {
     public AccessLog(
             String companyName,
             String visitorName,
+            LocalDate birthDate,
             String contact,
             String hostName,
             String serverName,
@@ -72,6 +83,7 @@ public class AccessLog {
     ) {
         this.companyName = companyName;
         this.visitorName = visitorName;
+        this.birthDate = birthDate;
         this.contact = contact;
         this.hostName = hostName;
         this.serverName = serverName;
@@ -98,6 +110,10 @@ public class AccessLog {
 
     public String getVisitorName() {
         return visitorName;
+    }
+
+    public LocalDate getBirthDate() {
+        return birthDate;
     }
 
     public String getContact() {
@@ -138,5 +154,46 @@ public class AccessLog {
 
     public LocalDateTime getCreatedAt() {
         return createdAt;
+    }
+
+    public LocalDateTime getExitedAt() {
+        return exitedAt;
+    }
+
+    public String getExitGuideName() {
+        return exitGuideName;
+    }
+
+    public void update(
+            String companyName,
+            String visitorName,
+            LocalDate birthDate,
+            String contact,
+            String hostName,
+            String serverName,
+            LocalDateTime visitedAt,
+            String content,
+            String signatureFileName,
+            String signatureContentType,
+            byte[] signatureImage,
+            byte[] pdfFile
+    ) {
+        this.companyName = companyName;
+        this.visitorName = visitorName;
+        this.birthDate = birthDate;
+        this.contact = contact;
+        this.hostName = hostName;
+        this.serverName = serverName;
+        this.visitedAt = visitedAt;
+        this.content = content;
+        this.signatureFileName = signatureFileName;
+        this.signatureContentType = signatureContentType;
+        this.signatureImage = signatureImage;
+        this.pdfFile = pdfFile;
+    }
+
+    public void checkout(String exitGuideName) {
+        this.exitedAt = LocalDateTime.now();
+        this.exitGuideName = exitGuideName;
     }
 }
