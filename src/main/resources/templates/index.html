@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>IT팀 출입대장</title>
+    <link rel="stylesheet" th:href="@{/css/app.css(v=2026061806)}">
+</head>
+<body>
+<main class="page-shell compact">
+    <section class="selection-panel">
+        <p class="eyebrow">Access Register</p>
+        <h1>IT팀 출입대장</h1>
+        <div class="register-choice-grid">
+            <a class="register-choice" th:href="@{/server-access}">
+                <span>서버 출입대장</span>
+            </a>
+            <button class="register-choice" type="button" disabled>
+                <span>서버 반출·입 대장</span>
+            </button>
+        </div>
+    </section>
+</main>
+</body>
+</html>

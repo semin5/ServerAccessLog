@@ -9,16 +9,16 @@
 <body>
 <main class="page-shell compact">
     <section class="result-panel login-panel">
-        <p class="eyebrow">Admin</p>
+        <p class="eyebrow">Server Access Log</p>
         <h1>관리자 확인</h1>
-        <form class="login-form" th:action="@{/admin/login}" method="post">
+        <form class="login-form" th:action="@{/server-access/admin/login}" method="post">
             <label>
                 <span>비밀번호</span>
                 <input type="password" name="password" autocomplete="current-password" autofocus>
             </label>
             <p class="login-error" th:if="${error}" th:text="${error}"></p>
             <div class="actions split">
-                <a class="button-link secondary" th:href="@{/}">돌아가기</a>
+                <a class="button-link secondary" th:href="@{/server-access}">돌아가기</a>
                 <button type="submit">입력</button>
             </div>
         </form>

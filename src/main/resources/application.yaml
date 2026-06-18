@@ -28,6 +28,7 @@ spring:
       max-request-size: 12MB
 
 server:
+  port: 3006
   error:
     whitelabel:
       enabled: false

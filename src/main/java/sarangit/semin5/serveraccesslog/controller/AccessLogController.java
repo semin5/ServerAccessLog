@@ -75,6 +75,12 @@ public class AccessLogController {
     }
 
     @GetMapping("/")
+    public String index(HttpSession session) {
+        session.removeAttribute(ADMIN_AUTH_SESSION_KEY);
+        return "index";
+    }
+
+    @GetMapping("/server-access")
     public String form(Model model, HttpSession session) {
         session.removeAttribute(ADMIN_AUTH_SESSION_KEY);
         if (!model.containsAttribute("accessLogForm")) {
@@ -85,7 +91,7 @@ public class AccessLogController {
         return "access-log/form";
     }
 
-    @PostMapping("/access-logs")
+    @PostMapping("/server-access/access-logs")
     public String create(
             @Valid @ModelAttribute AccessLogForm accessLogForm,
             BindingResult bindingResult,
@@ -109,21 +115,21 @@ public class AccessLogController {
             return "access-log/form";
         }
         redirectAttributes.addAttribute("id", saved.getId());
-        return "redirect:/complete/{id}";
+        return "redirect:/server-access/complete/{id}";
     }
 
-    @GetMapping("/complete/{id}")
+    @GetMapping("/server-access/complete/{id}")
     public String complete(@PathVariable Long id, Model model) {
         model.addAttribute("accessLog", accessLogService.get(id));
         return "access-log/complete";
     }
 
-    @GetMapping("/admin/login")
+    @GetMapping("/server-access/admin/login")
     public String adminLogin() {
         return "admin/login";
     }
 
-    @PostMapping("/admin/login")
+    @PostMapping("/server-access/admin/login")
     public String adminLogin(
             @RequestParam String password,
             HttpSession session,
@@ -131,13 +137,13 @@ public class AccessLogController {
     ) {
         if (ADMIN_PASSWORD.equals(password)) {
             session.setAttribute(ADMIN_AUTH_SESSION_KEY, true);
-            return "redirect:/admin";
+            return "redirect:/server-access/admin";
         }
         model.addAttribute("error", "비밀번호가 올바르지 않습니다.");
         return "admin/login";
     }
 
-    @GetMapping("/admin")
+    @GetMapping("/server-access/admin")
     public String admin(
             @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
             @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
@@ -146,7 +152,7 @@ public class AccessLogController {
             HttpSession session
     ) {
         if (!isAdminAuthenticated(session)) {
-            return "redirect:/admin/login";
+            return "redirect:/server-access/admin/login";
         }
 
         LocalDate today = LocalDate.now();
@@ -163,10 +169,10 @@ public class AccessLogController {
         return "admin/list";
     }
 
-    @GetMapping("/admin/{id}/edit")
+    @GetMapping("/server-access/admin/{id}/edit")
     public String edit(@PathVariable Long id, Model model, HttpSession session) {
         if (!isAdminAuthenticated(session)) {
-            return "redirect:/admin/login";
+            return "redirect:/server-access/admin/login";
         }
 
         AccessLog accessLog = accessLogService.get(id);
@@ -177,7 +183,7 @@ public class AccessLogController {
         return "admin/edit";
     }
 
-    @PostMapping("/admin/{id}/edit")
+    @PostMapping("/server-access/admin/{id}/edit")
     public String update(
             @PathVariable Long id,
             @Valid @ModelAttribute AccessLogForm accessLogForm,
@@ -187,7 +193,7 @@ public class AccessLogController {
             HttpSession session
     ) {
         if (!isAdminAuthenticated(session)) {
-            return "redirect:/admin/login";
+            return "redirect:/server-access/admin/login";
         }
 
         AccessLog accessLog = accessLogService.get(id);
@@ -204,10 +210,10 @@ public class AccessLogController {
             return "admin/edit";
         }
         redirectAttributes.addFlashAttribute("message", "출입 기록을 수정했습니다.");
-        return "redirect:/admin";
+        return "redirect:/server-access/admin";
     }
 
-    @PostMapping("/admin/{id}/checkout")
+    @PostMapping("/server-access/admin/{id}/checkout")
     public String checkout(
             @PathVariable Long id,
             @RequestParam String managerName,
@@ -215,7 +221,7 @@ public class AccessLogController {
             HttpSession session
     ) {
         if (!isAdminAuthenticated(session)) {
-            return "redirect:/admin/login";
+            return "redirect:/server-access/admin/login";
         }
 
         try {
@@ -224,10 +230,10 @@ public class AccessLogController {
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("message", e.getMessage());
         }
-        return "redirect:/admin";
+        return "redirect:/server-access/admin";
     }
 
-    @PostMapping("/admin/pdf")
+    @PostMapping("/server-access/admin/pdf")
     public ResponseEntity<byte[]> selectedPdf(
             @RequestParam(name = "selectedIds", required = false) List<Long> selectedIds,
             @RequestParam(name = "ledgerYear", required = false) Integer ledgerYear,
@@ -237,7 +243,7 @@ public class AccessLogController {
     ) {
         if (!isAdminAuthenticated(session)) {
             return ResponseEntity.status(302)
-                    .header(HttpHeaders.LOCATION, "/admin/login")
+                    .header(HttpHeaders.LOCATION, "/server-access/admin/login")
                     .build();
         }
 
@@ -258,11 +264,11 @@ public class AccessLogController {
                 .body(bytes);
     }
 
-    @GetMapping("/admin/{id}/pdf")
+    @GetMapping("/server-access/admin/{id}/pdf")
     public ResponseEntity<byte[]> pdf(@PathVariable Long id, HttpSession session) {
         if (!isAdminAuthenticated(session)) {
             return ResponseEntity.status(302)
-                    .header(HttpHeaders.LOCATION, "/admin/login")
+                    .header(HttpHeaders.LOCATION, "/server-access/admin/login")
                     .build();
         }
 
@@ -277,7 +283,7 @@ public class AccessLogController {
                 .body(bytes);
     }
 
-    @GetMapping("/admin/{id}/signature")
+    @GetMapping("/server-access/admin/{id}/signature")
     public ResponseEntity<byte[]> signature(@PathVariable Long id) {
         AccessLog accessLog = accessLogService.get(id);
         return ResponseEntity.ok()

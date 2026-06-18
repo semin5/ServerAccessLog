@@ -13,10 +13,10 @@
             <p class="eyebrow">Server Access Log</p>
             <h1>서버 출입 대장</h1>
         </div>
-        <a class="button-link" th:href="@{/admin}">관리자</a>
+        <a class="button-link" th:href="@{/server-access/admin}">관리자</a>
     </header>
 
-    <form class="entry-form" th:action="@{/access-logs}" th:object="${accessLogForm}" method="post" enctype="multipart/form-data">
+    <form class="entry-form" th:action="@{/server-access/access-logs}" th:object="${accessLogForm}" method="post" enctype="multipart/form-data">
         <div class="form-alert" th:if="${#fields.hasGlobalErrors()}">
             <p th:each="error : ${#fields.globalErrors()}" th:text="${error}"></p>
         </div>
