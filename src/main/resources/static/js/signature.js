@@ -4,6 +4,8 @@
     const clearButton = document.getElementById("clearSignature");
     const fileInput = document.querySelector('input[type="file"][name="signatureFile"]');
     const form = document.querySelector("form.entry-form");
+    const privacyCheckbox = document.querySelector('input[name="privacyAgreed"]');
+    const submitButton = document.getElementById("submitEntry") || form?.querySelector('button[type="submit"]');
     if (!canvas || !hiddenInput || !form) {
         return;
     }
@@ -62,6 +64,15 @@
         hiddenInput.value = "";
     }
 
+    function syncSubmitButton() {
+        if (!privacyCheckbox || !submitButton) {
+            return;
+        }
+        const agreed = privacyCheckbox.checked;
+        submitButton.disabled = !agreed;
+        submitButton.classList.toggle("is-ready", agreed);
+    }
+
     canvas.addEventListener("mousedown", start);
     canvas.addEventListener("mousemove", move);
     window.addEventListener("mouseup", stop);
@@ -74,6 +85,7 @@
             clear();
         }
     });
+    privacyCheckbox?.addEventListener("change", syncSubmitButton);
     form.addEventListener("submit", function () {
         if (dirty && (!fileInput || fileInput.files.length === 0)) {
             hiddenInput.value = canvas.toDataURL("image/png");
@@ -81,4 +93,5 @@
     });
 
     resizeCanvas();
+    syncSubmitButton();
 })();

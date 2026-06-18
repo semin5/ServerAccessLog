@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>관리자 로그인</title>
+    <link rel="stylesheet" th:href="@{/css/app.css(v=2026061806)}">
+</head>
+<body>
+<main class="page-shell compact">
+    <section class="result-panel login-panel">
+        <p class="eyebrow">Admin</p>
+        <h1>관리자 확인</h1>
+        <form class="login-form" th:action="@{/admin/login}" method="post">
+            <label>
+                <span>비밀번호</span>
+                <input type="password" name="password" autocomplete="current-password" autofocus>
+            </label>
+            <p class="login-error" th:if="${error}" th:text="${error}"></p>
+            <div class="actions split">
+                <a class="button-link secondary" th:href="@{/}">돌아가기</a>
+                <button type="submit">입력</button>
+            </div>
+        </form>
+    </section>
+</main>
+</body>
+</html>

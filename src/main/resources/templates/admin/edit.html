@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>출입 기록 수정</title>
-    <link rel="stylesheet" th:href="@{/css/app.css}">
+    <link rel="stylesheet" th:href="@{/css/app.css(v=2026061806)}">
 </head>
 <body>
 <main class="page-shell">
@@ -13,13 +13,14 @@
             <p class="eyebrow">Admin</p>
             <h1>출입 기록 수정</h1>
         </div>
-        <a class="quiet-link" th:href="@{/admin}">목록</a>
+        <a class="button-link secondary" th:href="@{/admin}">목록</a>
     </header>
 
     <form class="entry-form" th:action="@{/admin/{id}/edit(id=${accessLog.id})}" th:object="${accessLogForm}" method="post" enctype="multipart/form-data">
         <div class="form-alert" th:if="${#fields.hasGlobalErrors()}">
             <p th:each="error : ${#fields.globalErrors()}" th:text="${error}"></p>
         </div>
+
         <div class="form-grid">
             <label>
                 <span>소속</span>
@@ -33,11 +34,11 @@
             </label>
             <label>
                 <span>생년월일</span>
-                <input type="date" th:field="*{birthDate}">
+                <input type="text" th:field="*{birthDate}" inputmode="numeric" placeholder="예: 1990-01-01">
                 <small th:errors="*{birthDate}"></small>
             </label>
             <label>
-                <span>출입 시간</span>
+                <span>입실 시간</span>
                 <input type="datetime-local" th:field="*{visitedAt}">
                 <small th:errors="*{visitedAt}"></small>
             </label>
@@ -66,11 +67,11 @@
         </section>
 
         <div class="actions split">
-            <button type="submit">저장</button>
             <a class="button-link secondary" th:href="@{/admin}">취소</a>
+            <button type="submit">저장</button>
         </div>
     </form>
 </main>
-<script th:src="@{/js/signature.js}"></script>
+<script th:src="@{/js/signature.js(v=2026061802)}"></script>
 </body>
 </html>

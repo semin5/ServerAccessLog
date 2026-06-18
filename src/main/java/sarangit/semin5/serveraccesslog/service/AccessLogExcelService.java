@@ -34,7 +34,7 @@ public class AccessLogExcelService {
             headerStyle.setFont(headerFont);
 
             Row header = sheet.createRow(0);
-            String[] columns = {"번호", "소속", "성명", "생년월일", "출입 시간", "퇴실 시간", "안내자", "출입사유", "등록 시간", "서명"};
+            String[] columns = {"번호", "소속", "성명", "생년월일", "입실 시간", "퇴실 시간", "담당자", "출입사유", "등록 시간", "서명"};
             for (int i = 0; i < columns.length; i++) {
                 header.createCell(i).setCellValue(columns[i]);
                 header.getCell(i).setCellStyle(headerStyle);

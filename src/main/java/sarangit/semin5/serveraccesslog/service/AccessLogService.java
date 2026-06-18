@@ -1,6 +1,8 @@
 package sarangit.semin5.serveraccesslog.service;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
@@ -13,7 +15,7 @@ import sarangit.semin5.serveraccesslog.web.AccessLogForm;
 @Service
 public class AccessLogService {
 
-    private static final List<String> EXIT_GUIDE_NAMES = List.of("김재현 팀장", "강성구 사원", "오세민 사원", "최인호 사원");
+    private static final List<String> MANAGER_NAMES = List.of("김재현 팀장", "강성구 사원", "오세민 사원", "최인호 사원");
 
     private final AccessLogRepository accessLogRepository;
     private final PdfService pdfService;
@@ -78,20 +80,41 @@ public class AccessLogService {
     }
 
     @Transactional
-    public void checkout(Long id, String exitGuideName) {
-        if (!EXIT_GUIDE_NAMES.contains(exitGuideName)) {
-            throw new IllegalArgumentException("안내자를 선택해주세요.");
+    public void checkout(Long id, String managerName) {
+        if (!MANAGER_NAMES.contains(managerName)) {
+            throw new IllegalArgumentException("담당자를 선택해주세요.");
         }
-        get(id).checkout(exitGuideName);
+        get(id).checkout(managerName);
     }
 
-    public List<String> exitGuideNames() {
-        return EXIT_GUIDE_NAMES;
+    public List<String> managerNames() {
+        return MANAGER_NAMES;
     }
 
     @Transactional(readOnly = true)
     public List<AccessLog> findAll() {
         return accessLogRepository.findAllByOrderByVisitedAtDescIdDesc();
+    }
+
+    @Transactional(readOnly = true)
+    public List<AccessLog> findByVisitedDateRange(LocalDate startDate, LocalDate endDate, String managerName) {
+        LocalDateTime start = startDate.atStartOfDay();
+        LocalDateTime end = endDate.plusDays(1).atStartOfDay().minusNanos(1);
+        String resolvedManagerName = managerName == null || managerName.isBlank() ? null : managerName;
+        return accessLogRepository.findByVisitedAtBetweenAndManager(start, end, resolvedManagerName);
+    }
+
+    @Transactional(readOnly = true)
+    public List<AccessLog> findByIds(List<Long> ids) {
+        return accessLogRepository.findAllById(ids).stream()
+                .sorted((left, right) -> {
+                    int visitedCompare = right.getVisitedAt().compareTo(left.getVisitedAt());
+                    if (visitedCompare != 0) {
+                        return visitedCompare;
+                    }
+                    return right.getId().compareTo(left.getId());
+                })
+                .toList();
     }
 
     @Transactional(readOnly = true)

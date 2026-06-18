@@ -109,6 +109,53 @@ h2 {
     font-weight: 800;
 }
 
+.filter-bar {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(180px, 240px)) auto;
+    gap: 12px;
+    align-items: end;
+    margin-bottom: 16px;
+    padding: 16px;
+    border: 1px solid #dce5df;
+    border-radius: 8px;
+    background: #ffffff;
+}
+
+.filter-bar label {
+    gap: 6px;
+}
+
+.filter-bar label span {
+    color: #3f4b5b;
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.filter-bar input,
+.filter-bar select {
+    width: 100%;
+    min-height: 42px;
+    border: 1px solid #cbd7d1;
+    border-radius: 6px;
+    background: #fbfdfc;
+    color: #172033;
+    font: inherit;
+    font-size: 15px;
+    padding: 8px 10px;
+}
+
+.filter-bar button[type="submit"] {
+    min-height: 42px;
+    border: 0;
+    border-radius: 6px;
+    background: #176c5f;
+    color: #ffffff;
+    font: inherit;
+    font-weight: 900;
+    padding: 0 18px;
+    cursor: pointer;
+}
+
 label,
 .wide-field {
     display: grid;
@@ -164,6 +211,11 @@ small {
     align-items: center;
     justify-content: space-between;
     gap: 12px;
+}
+
+.actions.right {
+    display: flex;
+    justify-content: flex-end;
 }
 
 canvas {
@@ -279,6 +331,30 @@ button[type="submit"],
     cursor: pointer;
 }
 
+button:disabled {
+    background: #a8b8af;
+    color: #eef5f1;
+    opacity: 0.65;
+    cursor: not-allowed;
+}
+
+#submitEntry.entry-submit {
+    background: #b8c8c0 !important;
+    color: #f4f7f4 !important;
+    opacity: 1;
+}
+
+#submitEntry.entry-submit.is-ready {
+    background: #176c5f !important;
+    color: #ffffff !important;
+}
+
+#submitEntry.entry-submit:disabled {
+    background: #b8c8c0 !important;
+    color: #f4f7f4 !important;
+    opacity: 1;
+}
+
 .button-link.secondary {
     background: #e7eeeb;
     color: #1d3b35;
@@ -294,7 +370,8 @@ button[type="submit"],
 table {
     width: 100%;
     border-collapse: collapse;
-    min-width: 840px;
+    table-layout: fixed;
+    min-width: 1130px;
 }
 
 th,
@@ -311,8 +388,23 @@ th {
     font-size: 14px;
 }
 
+.select-cell {
+    text-align: center;
+}
+
+.select-cell input {
+    width: 18px;
+    height: 18px;
+    padding: 0;
+}
+
 .content-cell {
-    max-width: 360px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.text-cell {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -334,21 +426,181 @@ th {
     justify-content: center;
     min-height: 36px;
     padding: 0 12px;
+    border: 1px solid #8fb1a6;
     border-radius: 6px;
-    background: #eef5f1;
+    background: #ffffff;
     color: #1c5e54;
+}
+
+.table-action:hover {
+    background: #eef5f1;
+}
+
+.table-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+}
+
+.admin-table .col-select {
+    width: 58px;
+}
+
+.admin-table .col-id {
+    width: 72px;
+}
+
+.admin-table .col-date {
+    width: 120px;
+}
+
+.admin-table .col-visitor {
+    width: 120px;
+}
+
+.visitor-cell {
+    display: grid;
+    gap: 8px;
+    justify-items: start;
+}
+
+.visitor-name {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: 900;
+}
+
+.detail-button {
+    min-height: 30px;
+    padding: 0 10px;
+    border: 1px solid #8fb1a6;
+    border-radius: 6px;
+    background: #ffffff;
+    color: #1c5e54;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 900;
+    cursor: pointer;
+}
+
+.detail-button:hover {
+    background: #eef5f1;
+}
+
+.admin-table .col-time {
+    width: 82px;
+}
+
+.admin-table .col-exit {
+    width: 136px;
+}
+
+.admin-table .col-reason {
+    width: 260px;
+}
+
+.admin-table .col-actions {
+    width: 150px;
+}
+
+.visitor-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 20;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+}
+
+.visitor-modal.is-open {
+    display: flex;
+}
+
+.visitor-modal__backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(23, 32, 51, 0.48);
+}
+
+.visitor-modal__panel {
+    position: relative;
+    z-index: 1;
+    width: min(520px, 100%);
+    max-height: calc(100vh - 48px);
+    overflow: auto;
+    border: 1px solid #dce5df;
+    border-radius: 8px;
+    background: #ffffff;
+    box-shadow: 0 24px 60px rgba(23, 32, 51, 0.28);
+    padding: 22px;
+}
+
+.visitor-modal__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 18px;
+}
+
+.modal-close-button {
+    width: 38px;
+    height: 38px;
+    border: 1px solid #cbd7d1;
+    border-radius: 6px;
+    background: #ffffff;
+    color: #172033;
+    font-size: 24px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.detail-list {
+    display: grid;
+    gap: 14px;
+    margin: 0;
+}
+
+.detail-list div {
+    display: grid;
+    grid-template-columns: 96px 1fr;
+    gap: 12px;
+    align-items: start;
+}
+
+.detail-list dt {
+    color: #3f4b5b;
+    font-weight: 900;
+}
+
+.detail-list dd {
+    margin: 0;
+}
+
+.modal-signature {
+    display: block;
+    width: min(320px, 100%);
+    height: 120px;
+    object-fit: contain;
+    border: 1px solid #d7e1dc;
+    border-radius: 6px;
+    background: #ffffff;
 }
 
 .checkout-form {
     display: grid;
-    grid-template-columns: minmax(130px, 1fr) auto;
+    grid-template-columns: 1fr;
     gap: 8px;
     align-items: center;
-    min-width: 230px;
+    justify-items: start;
+    min-width: 0;
 }
 
 .checkout-form select {
-    width: 100%;
+    width: 122px;
     min-height: 36px;
     border: 1px solid #cbd7d1;
     border-radius: 6px;
@@ -368,21 +620,23 @@ th {
     font-weight: 900;
     padding: 0 12px;
     cursor: pointer;
+    width: 122px;
 }
 
 .checkout-done {
     display: grid;
-    gap: 4px;
+    gap: 2px;
     min-width: 150px;
 }
 
 .checkout-done strong {
-    font-size: 13px;
+    font-size: inherit;
 }
 
 .checkout-done span {
-    color: #526172;
-    font-size: 13px;
+    color: inherit;
+    font-size: inherit;
+    font-weight: 400;
 }
 
 .current-signature {
@@ -424,9 +678,30 @@ th {
     font-size: 18px;
 }
 
+.login-form {
+    display: grid;
+    gap: 18px;
+    margin-top: 22px;
+}
+
+.login-error {
+    margin: 0;
+    color: #b42318;
+    font-weight: 800;
+}
+
+.print-date-field {
+    display: none;
+}
+
+.print-date-field.is-visible {
+    display: grid;
+}
+
 @media (max-width: 720px) {
     .top-bar,
     .form-grid,
+    .filter-bar,
     .section-heading,
     .header-actions,
     .actions.split {
