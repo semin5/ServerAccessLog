@@ -1,10 +1,15 @@
 package sarangit.semin5.serveraccesslog.service;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -15,20 +20,23 @@ import sarangit.semin5.serveraccesslog.web.AccessLogForm;
 @Service
 public class AccessLogService {
 
-    private static final List<String> MANAGER_NAMES = List.of("김재현 팀장", "강성구 사원", "오세민 사원", "최인호 사원");
+    private static final List<String> DEFAULT_MANAGER_NAMES = List.of("김재현 팀장", "강성구 사원", "오세민 사원", "최인호 사원");
 
     private final AccessLogRepository accessLogRepository;
     private final PdfService pdfService;
     private final SignatureImageService signatureImageService;
+    private final List<String> managerNames;
 
     public AccessLogService(
             AccessLogRepository accessLogRepository,
             PdfService pdfService,
-            SignatureImageService signatureImageService
+            SignatureImageService signatureImageService,
+            @Value("${ACCESS_LOG_MANAGERS:}") String managerNames
     ) {
         this.accessLogRepository = accessLogRepository;
         this.pdfService = pdfService;
         this.signatureImageService = signatureImageService;
+        this.managerNames = resolveManagerNames(managerNames);
     }
 
     @Transactional
@@ -81,14 +89,14 @@ public class AccessLogService {
 
     @Transactional
     public void checkout(Long id, String managerName) {
-        if (!MANAGER_NAMES.contains(managerName)) {
-            throw new IllegalArgumentException("담당자를 선택해주세요.");
+        if (!managerNames.contains(managerName)) {
+            throw new IllegalArgumentException("담당자를 선택해 주세요.");
         }
         get(id).checkout(managerName);
     }
 
     public List<String> managerNames() {
-        return MANAGER_NAMES;
+        return managerNames;
     }
 
     @Transactional(readOnly = true)
@@ -121,6 +129,52 @@ public class AccessLogService {
     public AccessLog get(Long id) {
         return accessLogRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("출입 기록을 찾을 수 없습니다. id=" + id));
+    }
+
+    private List<String> parseManagerNames(String configuredManagerNames) {
+        List<String> parsedManagerNames = Arrays.stream(configuredManagerNames.split(","))
+                .map(String::trim)
+                .filter(name -> !name.isBlank())
+                .toList();
+        if (parsedManagerNames.isEmpty()) {
+            throw new IllegalStateException("담당자 목록을 1명 이상 설정해 주세요.");
+        }
+        return parsedManagerNames;
+    }
+
+    private List<String> resolveManagerNames(String configuredManagerNames) {
+        return readManagerNamesFromEnvFile()
+                .or(() -> readManagerNamesFromSystemEnv())
+                .or(() -> parseConfiguredManagerNames(configuredManagerNames))
+                .orElse(DEFAULT_MANAGER_NAMES);
+    }
+
+    private Optional<List<String>> readManagerNamesFromEnvFile() {
+        Path envPath = Path.of(".env");
+        if (!Files.exists(envPath)) {
+            return Optional.empty();
+        }
+        try {
+            return Files.readAllLines(envPath, StandardCharsets.UTF_8).stream()
+                    .map(String::trim)
+                    .filter(line -> line.startsWith("ACCESS_LOG_MANAGERS="))
+                    .map(line -> line.substring("ACCESS_LOG_MANAGERS=".length()))
+                    .map(this::parseManagerNames)
+                    .findFirst();
+        } catch (IOException e) {
+            return Optional.empty();
+        }
+    }
+
+    private Optional<List<String>> readManagerNamesFromSystemEnv() {
+        return parseConfiguredManagerNames(System.getenv("ACCESS_LOG_MANAGERS"));
+    }
+
+    private Optional<List<String>> parseConfiguredManagerNames(String configuredManagerNames) {
+        if (configuredManagerNames == null || configuredManagerNames.isBlank()) {
+            return Optional.empty();
+        }
+        return Optional.of(parseManagerNames(configuredManagerNames));
     }
 
     record SignatureImage(byte[] bytes, String fileName, String contentType) {
