@@ -118,6 +118,13 @@ public class AccessLogBatchPdfService {
     }
 
     private PDFont loadKoreanFont(PDDocument document) throws IOException {
+        ClassPathResource embeddedFont = new ClassPathResource("fonts/malgun.ttf");
+        if (embeddedFont.exists()) {
+            try (var inputStream = embeddedFont.getInputStream()) {
+                return PDType0Font.load(document, inputStream);
+            }
+        }
+
         List<String> candidates = List.of(
                 "C:/Windows/Fonts/malgun.ttf",
                 "C:/Windows/Fonts/gulim.ttc",

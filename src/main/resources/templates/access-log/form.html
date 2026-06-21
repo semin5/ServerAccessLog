@@ -13,7 +13,10 @@
             <p class="eyebrow">Server Access Log</p>
             <h1>서버 출입 대장</h1>
         </div>
-        <a class="button-link" th:href="@{/server-access/admin}">관리자</a>
+        <div class="header-actions">
+            <a class="button-link secondary" th:href="@{/}">처음으로</a>
+            <a class="button-link" th:href="@{/server-access/admin}">관리자</a>
+        </div>
     </header>
 
     <form class="entry-form" th:action="@{/server-access/access-logs}" th:object="${accessLogForm}" method="post" enctype="multipart/form-data">
@@ -53,7 +56,7 @@
         <section class="signature-panel">
             <div class="section-heading">
                 <h2>서명</h2>
-                <button class="icon-button" type="button" id="clearSignature" aria-label="서명 지우기" title="서명 지우기">↺</button>
+                <button class="icon-button" type="button" id="clearSignature" aria-label="서명 지우기" title="서명 지우기">↶</button>
             </div>
             <canvas id="signatureCanvas" width="900" height="320"></canvas>
             <input type="hidden" th:field="*{signatureData}" id="signatureData">
@@ -61,10 +64,6 @@
         </section>
 
         <section class="consent-panel">
-            <label class="check-line">
-                <input type="checkbox" th:field="*{privacyAgreed}" id="privacyAgreed">
-                <span>개인정보 수집 및 이용에 동의합니다.</span>
-            </label>
             <small th:errors="*{privacyAgreed}"></small>
             <details>
                 <summary>개인정보 동의 조항 보기</summary>
@@ -75,6 +74,10 @@
                     <p>동의를 거부할 수 있으나, 동의하지 않을 경우 서버실 출입 기록 등록이 제한될 수 있습니다.</p>
                 </div>
             </details>
+            <label class="check-line">
+                <input type="checkbox" th:field="*{privacyAgreed}" id="privacyAgreed">
+                <span>개인정보 수집 및 이용에 동의합니다.</span>
+            </label>
         </section>
 
         <div class="actions right">

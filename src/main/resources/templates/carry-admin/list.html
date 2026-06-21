@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>관리자 - 서버 반출·입 대장</title>
+    <link rel="stylesheet" th:href="@{/css/app.css(v=2026061904)}">
+</head>
+<body>
+<main class="page-shell wide">
+    <header class="top-bar">
+        <div>
+            <p class="eyebrow">Server Carry Register</p>
+            <h1>반출·입 기록</h1>
+        </div>
+        <div class="header-actions">
+            <a class="button-link secondary" th:href="@{/}">처음으로</a>
+            <a class="button-link secondary" th:href="@{/server-carry}">작성 화면</a>
+            <button class="button-link" type="button" id="openLedgerPrintModal">관리대장 출력</button>
+        </div>
+    </header>
+
+    <form class="filter-bar" th:action="@{/server-carry/admin}" method="get">
+        <label>
+            <span>시작일</span>
+            <input type="date" name="startDate" th:value="${#temporals.format(startDate, 'yyyy-MM-dd')}">
+        </label>
+        <label>
+            <span>종료일</span>
+            <input type="date" name="endDate" th:value="${#temporals.format(endDate, 'yyyy-MM-dd')}">
+        </label>
+        <label>
+            <span>담당자</span>
+            <select name="managerName">
+                <option value="">전체</option>
+                <option th:each="manager : ${managerNames}"
+                        th:value="${manager}"
+                        th:text="${#strings.arraySplit(manager, ' ')[0]}"
+                        th:selected="${manager == managerName}"></option>
+            </select>
+        </label>
+        <button type="submit">조회</button>
+    </form>
+
+    <p class="notice" th:if="${message}" th:text="${message}"></p>
+
+    <form id="pdfForm" th:action="@{/server-carry/admin/pdf}" method="post">
+        <input type="hidden" name="ledgerYear" id="ledgerYearInput" th:value="${currentYear}">
+        <input type="hidden" name="printDateEnabled" id="printDateEnabledInput" value="false">
+        <input type="hidden" name="printDate" id="printDateInput" th:value="${today}">
+    </form>
+
+    <section class="table-wrap">
+        <table class="admin-table compact-table carry-table">
+            <colgroup>
+                <col class="col-select">
+                <col class="col-id">
+                <col class="col-date">
+                <col class="col-visitor">
+                <col class="col-time">
+                <col class="col-exit">
+                <col class="col-asset-combined">
+                <col class="col-reason">
+                <col class="col-actions">
+            </colgroup>
+            <thead>
+            <tr>
+                <th class="select-cell">
+                    <input type="checkbox" id="selectAllRows" aria-label="전체 선택">
+                </th>
+                <th>번호</th>
+                <th>일자</th>
+                <th>성명</th>
+                <th>입실</th>
+                <th>퇴실 / 담당자</th>
+                <th>장비 / 저장매체</th>
+                <th>작업 내역</th>
+                <th>관리</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:if="${#lists.isEmpty(carryLogs)}">
+                <td colspan="9" class="empty">저장된 기록이 없습니다.</td>
+            </tr>
+            <tr th:each="log : ${carryLogs}">
+                <td class="select-cell">
+                    <input class="row-check" type="checkbox" name="selectedIds" th:value="${log.id}" form="pdfForm">
+                </td>
+                <td th:text="${log.id}"></td>
+                <td th:text="${#temporals.format(log.workDate, 'yyyy-MM-dd')}"></td>
+                <td>
+                    <div class="visitor-cell">
+                        <span class="visitor-name" th:text="${log.visitorName}"></span>
+                        <button class="detail-button"
+                                type="button"
+                                th:attr="data-modal-target=${'carryModal-' + log.id}">
+                            자세히
+                        </button>
+                    </div>
+                </td>
+                <td th:text="${#temporals.format(log.visitedAt, 'HH:mm')}"></td>
+                <td>
+                    <div class="checkout-done" th:if="${log.exitedAt != null}">
+                        <span th:text="${#temporals.format(log.exitedAt, 'HH:mm')}"></span>
+                        <span th:text="${#strings.arraySplit(log.exitGuideName, ' ')[0]}"></span>
+                    </div>
+                    <form class="checkout-form" th:if="${log.exitedAt == null}" th:action="@{/server-carry/admin/{id}/checkout(id=${log.id})}" method="post">
+                        <select name="managerName" required>
+                            <option value="">담당자 선택</option>
+                            <option th:each="manager : ${managerNames}"
+                                    th:value="${manager}"
+                                    th:text="${#strings.arraySplit(manager, ' ')[0]}"></option>
+                        </select>
+                        <button type="submit">퇴실</button>
+                    </form>
+                </td>
+                <td>
+                    <div class="asset-combined">
+                        <div class="asset-line" th:if="${log.equipmentInbound || log.equipmentOutbound || !#strings.isEmpty(log.equipmentModelName)}">
+                            <span class="asset-icon equipment-icon">장비</span>
+                            <span class="asset-direction" th:if="${log.equipmentInbound}">반입</span>
+                            <span class="asset-direction" th:if="${log.equipmentOutbound}">반출</span>
+                            <small th:text="${log.equipmentModelName}"></small>
+                        </div>
+                        <div class="asset-line" th:if="${log.storageInbound || log.storageOutbound || !#strings.isEmpty(log.storageModelName)}">
+                            <span class="asset-icon storage-icon">저장</span>
+                            <span class="asset-direction" th:if="${log.storageInbound}">반입</span>
+                            <span class="asset-direction" th:if="${log.storageOutbound}">반출</span>
+                            <small th:text="${log.storageModelName}"></small>
+                        </div>
+                    </div>
+                </td>
+                <td class="content-cell" th:text="${log.workContent}"></td>
+                <td>
+                    <div class="table-actions">
+                        <a class="table-action" th:href="@{/server-carry/admin/{id}/edit(id=${log.id})}">수정</a>
+                        <a class="table-action" th:href="@{/server-carry/admin/{id}/pdf(id=${log.id})}">확인서 출력</a>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <div class="visitor-modal"
+         th:each="log : ${carryLogs}"
+         th:id="${'carryModal-' + log.id}"
+         aria-hidden="true">
+        <div class="visitor-modal__backdrop" data-modal-close></div>
+        <section class="visitor-modal__panel" role="dialog" aria-modal="true" aria-labelledby="carryDetailTitle">
+            <div class="visitor-modal__header">
+                <h2 id="carryDetailTitle">반출·입 상세</h2>
+                <button class="modal-close-button" type="button" data-modal-close aria-label="닫기">×</button>
+            </div>
+            <dl class="detail-list">
+                <div>
+                    <dt>성명</dt>
+                    <dd th:text="${log.visitorName}"></dd>
+                </div>
+                <div>
+                    <dt>소속</dt>
+                    <dd th:text="${log.companyName}"></dd>
+                </div>
+                <div>
+                    <dt>직급</dt>
+                    <dd th:text="${log.jobTitle}"></dd>
+                </div>
+                <div>
+                    <dt>연락처</dt>
+                    <dd th:text="${log.contact}"></dd>
+                </div>
+                <div>
+                    <dt>입실시간</dt>
+                    <dd th:text="${#temporals.format(log.visitedAt, 'yyyy-MM-dd HH:mm')}"></dd>
+                </div>
+                <div>
+                    <dt>퇴실/담당자</dt>
+                    <dd th:text="${log.exitedAt == null ? '' : #temporals.format(log.exitedAt, 'HH:mm') + ' / ' + #strings.arraySplit(log.exitGuideName, ' ')[0]}"></dd>
+                </div>
+                <div>
+                    <dt>장비 모델명</dt>
+                    <dd th:text="${log.equipmentModelName}"></dd>
+                </div>
+                <div>
+                    <dt>저장매체 모델명</dt>
+                    <dd th:text="${log.storageModelName}"></dd>
+                </div>
+                <div>
+                    <dt>서명</dt>
+                    <dd>
+                        <img class="modal-signature" th:src="@{/server-carry/admin/{id}/signature(id=${log.id})}" alt="서명">
+                    </dd>
+                </div>
+            </dl>
+        </section>
+    </div>
+
+    <div class="visitor-modal" id="ledgerPrintModal" aria-hidden="true">
+        <div class="visitor-modal__backdrop" data-modal-close></div>
+        <section class="visitor-modal__panel" role="dialog" aria-modal="true" aria-labelledby="ledgerPrintTitle">
+            <div class="visitor-modal__header">
+                <h2 id="ledgerPrintTitle">관리대장 출력</h2>
+                <button class="modal-close-button" type="button" data-modal-close aria-label="닫기">×</button>
+            </div>
+            <div class="login-form">
+                <label>
+                    <span>년도</span>
+                    <input type="number" id="ledgerYearPicker" min="2000" max="2100" th:value="${currentYear}">
+                </label>
+                <label class="check-line">
+                    <input type="checkbox" id="printDateToggle">
+                    <span>출력일자 출력하기</span>
+                </label>
+                <label class="print-date-field" id="printDateField">
+                    <span>출력일자</span>
+                    <input type="date" id="printDatePicker" th:value="${today}" disabled>
+                </label>
+                <div class="actions split">
+                    <button class="button-link secondary" type="button" data-modal-close>취소</button>
+                    <button class="button-link" type="button" id="confirmLedgerPrint">출력</button>
+                </div>
+            </div>
+        </section>
+    </div>
+</main>
+<script th:src="@{/js/admin-list.js(v=2026061904)}"></script>
+</body>
+</html>

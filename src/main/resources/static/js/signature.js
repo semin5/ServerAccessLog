@@ -86,6 +86,18 @@
         }
     });
     privacyCheckbox?.addEventListener("change", syncSubmitButton);
+    document.querySelectorAll("[data-exclusive-group]").forEach((checkbox) => {
+        checkbox.addEventListener("change", function () {
+            if (!checkbox.checked) {
+                return;
+            }
+            document.querySelectorAll(`[data-exclusive-group="${checkbox.dataset.exclusiveGroup}"]`).forEach((other) => {
+                if (other !== checkbox) {
+                    other.checked = false;
+                }
+            });
+        });
+    });
     form.addEventListener("submit", function () {
         if (dirty && (!fileInput || fileInput.files.length === 0)) {
             hiddenInput.value = canvas.toDataURL("image/png");

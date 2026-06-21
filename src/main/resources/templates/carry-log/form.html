@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>서버 반출입 대장</title>
+    <link rel="stylesheet" th:href="@{/css/app.css(v=2026062201)}">
+</head>
+<body>
+<main class="page-shell">
+    <header class="top-bar">
+        <div>
+            <p class="eyebrow">Server Carry Register</p>
+            <h1>서버 반출입 대장</h1>
+        </div>
+        <div class="header-actions">
+            <a class="button-link secondary" th:href="@{/}">처음으로</a>
+            <a class="button-link" th:href="@{/server-carry/admin}">관리자</a>
+        </div>
+    </header>
+
+    <form class="entry-form" th:action="@{/server-carry/logs}" th:object="${carryLogForm}" method="post">
+        <div class="form-alert" th:if="${#fields.hasGlobalErrors()}">
+            <p th:each="error : ${#fields.globalErrors()}" th:text="${error}"></p>
+        </div>
+
+        <div class="form-grid">
+            <label>
+                <span>성명</span>
+                <input th:field="*{visitorName}" autocomplete="name">
+                <small th:errors="*{visitorName}"></small>
+            </label>
+            <label>
+                <span>소속</span>
+                <input th:field="*{companyName}" autocomplete="organization">
+                <small th:errors="*{companyName}"></small>
+            </label>
+            <label>
+                <span>직급</span>
+                <input th:field="*{jobTitle}">
+                <small th:errors="*{jobTitle}"></small>
+            </label>
+            <label>
+                <span>입실시간</span>
+                <input type="datetime-local" th:field="*{visitedAt}">
+                <small th:errors="*{visitedAt}"></small>
+            </label>
+            <label>
+                <span>연락처</span>
+                <input th:field="*{contact}" inputmode="tel" autocomplete="tel">
+                <small th:errors="*{contact}"></small>
+            </label>
+        </div>
+
+        <div class="asset-grid">
+            <section class="asset-panel">
+                <h2>장비</h2>
+                <div class="check-group">
+                    <label class="check-line">
+                        <input type="checkbox" th:field="*{equipmentInbound}" data-exclusive-group="equipment">
+                        <span>반입</span>
+                    </label>
+                    <label class="check-line">
+                        <input type="checkbox" th:field="*{equipmentOutbound}" data-exclusive-group="equipment">
+                        <span>반출</span>
+                    </label>
+                </div>
+                <label>
+                    <span>모델명</span>
+                    <input th:field="*{equipmentModelName}">
+                    <small th:errors="*{equipmentModelName}"></small>
+                </label>
+            </section>
+
+            <section class="asset-panel">
+                <h2>저장매체</h2>
+                <div class="check-group">
+                    <label class="check-line">
+                        <input type="checkbox" th:field="*{storageInbound}" data-exclusive-group="storage">
+                        <span>반입</span>
+                    </label>
+                    <label class="check-line">
+                        <input type="checkbox" th:field="*{storageOutbound}" data-exclusive-group="storage">
+                        <span>반출</span>
+                    </label>
+                </div>
+                <label>
+                    <span>모델명</span>
+                    <input th:field="*{storageModelName}">
+                    <small th:errors="*{storageModelName}"></small>
+                </label>
+            </section>
+        </div>
+
+        <label class="wide-field">
+            <span>작업 내역</span>
+            <textarea th:field="*{workContent}" rows="5"></textarea>
+            <small th:errors="*{workContent}"></small>
+        </label>
+
+        <section class="signature-panel">
+            <div class="section-heading">
+                <h2>서명</h2>
+                <button class="icon-button" type="button" id="clearSignature" aria-label="서명 되돌리기" title="서명 되돌리기">↺</button>
+            </div>
+            <canvas id="signatureCanvas" width="900" height="320"></canvas>
+            <input type="hidden" th:field="*{signatureData}" id="signatureData">
+            <small th:errors="*{signatureData}"></small>
+        </section>
+
+        <section class="consent-panel">
+            <small th:errors="*{privacyAgreed}"></small>
+            <details>
+                <summary>개인정보 수집 및 이용 동의 조항 보기</summary>
+                <div class="terms-box">
+                    <p>수집 항목: 소속, 성명, 직급, 입실시간, 연락처, 작업 내역, 서명</p>
+                    <p>수집 목적: 서버 장비 반출입 이력 관리, 보안 감사, 사고 발생 시 출입 사실 확인</p>
+                    <p>보관 기간: 회사 내부 보안 정책에 따른 보관 기간 동안 보관 후 파기</p>
+                    <p>동의를 거부할 수 있으나, 동의하지 않을 경우 서버 반출입 기록 등록이 제한될 수 있습니다.</p>
+                </div>
+            </details>
+            <label class="check-line">
+                <input type="checkbox" th:field="*{privacyAgreed}" id="privacyAgreed">
+                <span>개인정보 수집 및 이용에 동의합니다.</span>
+            </label>
+        </section>
+
+        <div class="actions right">
+            <button class="entry-submit" type="submit" id="submitEntry" disabled>저장</button>
+        </div>
+    </form>
+</main>
+<script th:src="@{/js/signature.js(v=2026062201)}"></script>
+</body>
+</html>
