@@ -113,6 +113,14 @@ h2 {
     cursor: not-allowed;
 }
 
+.index-footnote {
+    margin: 22px 0 0;
+    color: #8a96a3;
+    font-size: 12px;
+    font-weight: 700;
+    text-align: right;
+}
+
 .asset-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -591,6 +599,9 @@ th {
     border-radius: 6px;
     background: #ffffff;
     color: #1c5e54;
+    font: inherit;
+    font-weight: 900;
+    cursor: pointer;
 }
 
 .table-action:hover {
@@ -697,6 +708,19 @@ th {
     background: #ffffff;
     box-shadow: 0 24px 60px rgba(23, 32, 51, 0.28);
     padding: 22px;
+}
+
+.visitor-modal__panel.pdf-preview-panel {
+    width: min(920px, 100%);
+}
+
+.pdf-preview-frame {
+    display: block;
+    width: 100%;
+    height: min(72vh, 760px);
+    border: 1px solid #d7e1dc;
+    border-radius: 6px;
+    background: #f8fafc;
 }
 
 .visitor-modal__header {

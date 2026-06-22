@@ -265,7 +265,11 @@ public class AccessLogController {
     }
 
     @GetMapping("/server-access/admin/{id}/pdf")
-    public ResponseEntity<byte[]> pdf(@PathVariable Long id, HttpSession session) {
+    public ResponseEntity<byte[]> pdf(
+            @PathVariable Long id,
+            @RequestParam(name = "download", required = false, defaultValue = "false") boolean download,
+            HttpSession session
+    ) {
         if (!isAdminAuthenticated(session)) {
             return ResponseEntity.status(302)
                     .header(HttpHeaders.LOCATION, "/server-access/admin/login")
@@ -274,11 +278,15 @@ public class AccessLogController {
 
         AccessLog accessLog = accessLogService.get(id);
         byte[] bytes = pdfService.createAccessLogPdf(accessLog);
+        ContentDisposition contentDisposition = download
+                ? ContentDisposition.attachment()
+                .filename("server-access-confirmation-" + accessLog.getId() + ".pdf")
+                .build()
+                : ContentDisposition.inline()
+                .filename("server-access-confirmation-" + accessLog.getId() + ".pdf")
+                .build();
         return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, ContentDisposition.attachment()
-                        .filename("server-access-confirmation-" + accessLog.getId() + ".pdf")
-                        .build()
-                        .toString())
+                .header(HttpHeaders.CONTENT_DISPOSITION, contentDisposition.toString())
                 .contentType(MediaType.APPLICATION_PDF)
                 .body(bytes);
     }

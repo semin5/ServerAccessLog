@@ -30,7 +30,7 @@ public class CarryLogService {
                 form.getCompanyName(),
                 form.getJobTitle(),
                 form.getVisitedAt(),
-                form.getContact(),
+                formatPhoneNumber(form.getContact()),
                 form.isEquipmentInbound(),
                 form.isEquipmentOutbound(),
                 form.getEquipmentModelName(),
@@ -59,7 +59,7 @@ public class CarryLogService {
                 form.getCompanyName(),
                 form.getJobTitle(),
                 form.getVisitedAt(),
-                form.getContact(),
+                formatPhoneNumber(form.getContact()),
                 form.isEquipmentInbound(),
                 form.isEquipmentOutbound(),
                 form.getEquipmentModelName(),
@@ -131,6 +131,40 @@ public class CarryLogService {
         }
         byte[] bytes = Base64.getDecoder().decode(form.getSignatureData().substring(prefix.length()));
         return Optional.of(new SignatureImage(bytes, "signature.png", "image/png"));
+    }
+
+    private String formatPhoneNumber(String contact) {
+        if (contact == null || contact.isBlank()) {
+            return contact;
+        }
+
+        String trimmed = contact.trim();
+        String digits = trimmed.replaceAll("\\D", "");
+        if (digits.length() < 8) {
+            return trimmed;
+        }
+
+        if (digits.startsWith("02")) {
+            if (digits.length() == 9) {
+                return digits.substring(0, 2) + "-" + digits.substring(2, 5) + "-" + digits.substring(5);
+            }
+            if (digits.length() == 10) {
+                return digits.substring(0, 2) + "-" + digits.substring(2, 6) + "-" + digits.substring(6);
+            }
+        }
+
+        if (digits.startsWith("050") && digits.length() == 12) {
+            return digits.substring(0, 4) + "-" + digits.substring(4, 8) + "-" + digits.substring(8);
+        }
+
+        if (digits.length() == 10) {
+            return digits.substring(0, 3) + "-" + digits.substring(3, 6) + "-" + digits.substring(6);
+        }
+        if (digits.length() == 11) {
+            return digits.substring(0, 3) + "-" + digits.substring(3, 7) + "-" + digits.substring(7);
+        }
+
+        return trimmed;
     }
 
     private record SignatureImage(byte[] bytes, String fileName, String contentType) {

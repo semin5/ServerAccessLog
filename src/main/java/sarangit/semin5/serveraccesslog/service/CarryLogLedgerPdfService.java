@@ -14,6 +14,7 @@ import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.PDPageContentStream.AppendMode;
 import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.font.PDType0Font;
+import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import sarangit.semin5.serveraccesslog.domain.CarryLog;
@@ -43,7 +44,7 @@ public class CarryLogLedgerPdfService {
                     int start = pageIndex * ROWS_PER_PAGE;
                     int end = Math.min(start + ROWS_PER_PAGE, carryLogs.size());
                     for (int i = start; i < end; i++) {
-                        drawLogBlock(content, font, carryLogs.get(i), i - start);
+                        drawLogBlock(outputDocument, content, font, carryLogs.get(i), i - start);
                     }
                 }
             }
@@ -72,7 +73,7 @@ public class CarryLogLedgerPdfService {
         }
     }
 
-    private void drawLogBlock(PDPageContentStream content, PDFont font, CarryLog log, int index) throws IOException {
+    private void drawLogBlock(PDDocument document, PDPageContentStream content, PDFont font, CarryLog log, int index) throws IOException {
         float y = BLOCK_TOP_Y[index];
         drawCentered(content, font, 9, 206, y + 37, 119, log.getVisitorName());
         drawCentered(content, font, 9, 452, y + 39, 34, String.valueOf(log.getWorkDate().getYear()));
@@ -92,6 +93,7 @@ public class CarryLogLedgerPdfService {
         drawCheck(content, log.isStorageOutbound(), 153, y - 59);
         drawText(content, font, 9, 255, y - 58, value(log.getStorageModelName()));
         drawWrapped(content, font, 9, 92, y - 114, 455, log.getWorkContent(), 3);
+        drawSignature(document, content, log, 504, y - 148, 66, 36);
     }
 
     private PDFont loadKoreanFont(PDDocument document) throws IOException {
@@ -126,6 +128,19 @@ public class CarryLogLedgerPdfService {
         content.lineTo(x + 5, y + 1);
         content.lineTo(x + 11, y + 10);
         content.stroke();
+    }
+
+    private void drawSignature(PDDocument document, PDPageContentStream content, CarryLog log, float x, float y, float maxWidth, float maxHeight)
+            throws IOException {
+        byte[] signatureImage = log.getSignatureImage();
+        if (signatureImage == null || signatureImage.length == 0) {
+            return;
+        }
+        PDImageXObject image = PDImageXObject.createFromByteArray(document, signatureImage, "signature-" + log.getId());
+        float scale = Math.min(maxWidth / image.getWidth(), maxHeight / image.getHeight());
+        float width = image.getWidth() * scale;
+        float height = image.getHeight() * scale;
+        content.drawImage(image, x + ((maxWidth - width) / 2), y + ((maxHeight - height) / 2), width, height);
     }
 
     private void drawText(PDPageContentStream content, PDFont font, float size, float x, float y, String text) throws IOException {

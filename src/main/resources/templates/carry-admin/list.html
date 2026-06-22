@@ -3,15 +3,15 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>관리자 - 서버 반출·입 대장</title>
-    <link rel="stylesheet" th:href="@{/css/app.css(v=2026061904)}">
+    <title>관리자 - 서버 장비 반출·입 대장</title>
+    <link rel="stylesheet" th:href="@{/css/app.css(v=2026062202)}">
 </head>
 <body>
 <main class="page-shell wide">
     <header class="top-bar">
         <div>
             <p class="eyebrow">Server Carry Register</p>
-            <h1>반출·입 기록</h1>
+            <h1>서버 장비 반출·입 기록</h1>
         </div>
         <div class="header-actions">
             <a class="button-link secondary" th:href="@{/}">처음으로</a>
@@ -134,7 +134,12 @@
                 <td>
                     <div class="table-actions">
                         <a class="table-action" th:href="@{/server-carry/admin/{id}/edit(id=${log.id})}">수정</a>
-                        <a class="table-action" th:href="@{/server-carry/admin/{id}/pdf(id=${log.id})}">확인서 출력</a>
+                        <button class="table-action confirmation-preview-button"
+                                type="button"
+                                th:data-pdf-preview-url="@{/server-carry/admin/{id}/pdf(id=${log.id})}"
+                                th:data-pdf-print-url="@{/server-carry/admin/{id}/pdf(id=${log.id},download=true)}">
+                            확인서 출력
+                        </button>
                     </div>
                 </td>
             </tr>
@@ -195,6 +200,21 @@
         </section>
     </div>
 
+    <div class="visitor-modal" id="confirmationPreviewModal" aria-hidden="true">
+        <div class="visitor-modal__backdrop" data-modal-close></div>
+        <section class="visitor-modal__panel pdf-preview-panel" role="dialog" aria-modal="true" aria-labelledby="confirmationPreviewTitle">
+            <div class="visitor-modal__header">
+                <h2 id="confirmationPreviewTitle">확인서 미리보기</h2>
+                <button class="modal-close-button" type="button" data-modal-close aria-label="닫기">×</button>
+            </div>
+            <iframe class="pdf-preview-frame" id="confirmationPreviewFrame" title="확인서 미리보기"></iframe>
+            <div class="actions split">
+                <button class="button-link secondary" type="button" data-modal-close>취소</button>
+                <button class="button-link" type="button" id="printConfirmationPdf">출력</button>
+            </div>
+        </section>
+    </div>
+
     <div class="visitor-modal" id="ledgerPrintModal" aria-hidden="true">
         <div class="visitor-modal__backdrop" data-modal-close></div>
         <section class="visitor-modal__panel" role="dialog" aria-modal="true" aria-labelledby="ledgerPrintTitle">
@@ -217,12 +237,12 @@
                 </label>
                 <div class="actions split">
                     <button class="button-link secondary" type="button" data-modal-close>취소</button>
-                    <button class="button-link" type="button" id="confirmLedgerPrint">출력</button>
+                    <button class="button-link" type="button" id="confirmLedgerPrint">미리보기</button>
                 </div>
             </div>
         </section>
     </div>
 </main>
-<script th:src="@{/js/admin-list.js(v=2026061904)}"></script>
+<script th:src="@{/js/admin-list.js(v=2026062203)}"></script>
 </body>
 </html>

@@ -75,7 +75,7 @@ public class CarryLogPdfService {
         drawText(content, font, 10, 489, 193, String.format("%02d", pledgeDate.getMonthValue()));
         drawText(content, font, 10, 536, 193, String.format("%02d", pledgeDate.getDayOfMonth()));
         drawCentered(content, font, 10, 452, 153, 92, log.getVisitorName());
-        drawSignature(document, content, log, 520, 145, 58, 38);
+        drawSignature(document, content, log, 536, 136, 58, 38);
     }
 
     private PDFont loadKoreanFont(PDDocument document) throws IOException {
