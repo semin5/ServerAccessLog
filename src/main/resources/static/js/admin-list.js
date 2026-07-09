@@ -81,7 +81,7 @@
                 currentPreviewObjectUrl = "";
             }
             if (confirmationPreviewTitle) {
-                confirmationPreviewTitle.textContent = "확인서 미리보기";
+                confirmationPreviewTitle.textContent = "신청서 미리보기";
             }
             confirmationPreviewFrame.src = button.dataset.pdfPreviewUrl;
             printConfirmationPdf?.setAttribute("data-pdf-print-url", button.dataset.pdfPrintUrl || button.dataset.pdfPreviewUrl);

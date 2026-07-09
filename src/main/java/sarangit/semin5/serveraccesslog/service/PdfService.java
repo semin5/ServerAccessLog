@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDDocumentInformation;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.font.PDFont;
@@ -61,6 +62,7 @@ public class PdfService {
             byte[] signatureImage
     ) {
         try (PDDocument document = loadTemplate(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+            applyDocumentTitle(document);
             PDFont font = loadKoreanFont(document);
             PDImageXObject signature = signatureImage == null || signatureImage.length == 0
                     ? null
@@ -81,14 +83,20 @@ public class PdfService {
             document.save(out);
             return out.toByteArray();
         } catch (IOException e) {
-            throw new IllegalStateException("확인서 PDF 생성 중 오류가 발생했습니다.", e);
+            throw new IllegalStateException("신청서 PDF 생성 중 오류가 발생했습니다.", e);
         }
+    }
+
+    private void applyDocumentTitle(PDDocument document) {
+        PDDocumentInformation information = document.getDocumentInformation();
+        information.setTitle("IT팀 출입통제");
+        document.setDocumentInformation(information);
     }
 
     private PDDocument loadTemplate() throws IOException {
         ClassPathResource resource = new ClassPathResource(TEMPLATE_PDF_PATH);
         if (!resource.exists()) {
-            throw new IOException("확인서 PDF 양식 파일을 찾을 수 없습니다: " + TEMPLATE_PDF_PATH);
+            throw new IOException("신청서 PDF 양식 파일을 찾을 수 없습니다: " + TEMPLATE_PDF_PATH);
         }
         return Loader.loadPDF(resource.getInputStream().readAllBytes());
     }

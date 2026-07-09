@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDDocumentInformation;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.PDPageContentStream.AppendMode;
@@ -39,6 +40,7 @@ public class AccessLogBatchPdfService {
                 PDDocument outputDocument = new PDDocument();
                 ByteArrayOutputStream out = new ByteArrayOutputStream()
         ) {
+            applyDocumentTitle(outputDocument);
             PDFont font = loadKoreanFont(outputDocument);
             int totalPages = Math.max(1, (int) Math.ceil(accessLogs.size() / (double) ROWS_PER_PAGE));
 
@@ -59,6 +61,12 @@ public class AccessLogBatchPdfService {
         } catch (IOException e) {
             throw new IllegalStateException("PDF 출력 파일 생성 중 오류가 발생했습니다.", e);
         }
+    }
+
+    private void applyDocumentTitle(PDDocument document) {
+        PDDocumentInformation information = document.getDocumentInformation();
+        information.setTitle("IT팀 출입통제");
+        document.setDocumentInformation(information);
     }
 
     private void drawLedgerHeader(PDPageContentStream content, PDFont font, int ledgerYear, LocalDate printDate) throws IOException {

@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDDocumentInformation;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.PDPageContentStream.AppendMode;
@@ -28,6 +29,7 @@ public class CarryLogPdfService {
 
     public byte[] createPdf(CarryLog log) {
         try (PDDocument document = loadTemplate(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+            applyDocumentTitle(document);
             PDFont font = loadKoreanFont(document);
             PDPage page = document.getPage(0);
 
@@ -38,8 +40,14 @@ public class CarryLogPdfService {
             document.save(out);
             return out.toByteArray();
         } catch (IOException e) {
-            throw new IllegalStateException("반출입 확인서 PDF 생성 중 오류가 발생했습니다.", e);
+            throw new IllegalStateException("반출입 신청서 PDF 생성 중 오류가 발생했습니다.", e);
         }
+    }
+
+    private void applyDocumentTitle(PDDocument document) {
+        PDDocumentInformation information = document.getDocumentInformation();
+        information.setTitle("IT팀 출입통제");
+        document.setDocumentInformation(information);
     }
 
     private PDDocument loadTemplate() throws IOException {
