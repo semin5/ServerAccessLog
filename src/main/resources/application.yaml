@@ -5,9 +5,9 @@ spring:
   application:
     name: Server Access Log
   datasource:
-    url: ${DB_URL}
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
+    url: ${DB_URL:jdbc:mysql://localhost:3306/accesslog?serverTimezone=Asia/Seoul&characterEncoding=UTF-8}
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:}
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
@@ -28,7 +28,9 @@ spring:
       max-request-size: 12MB
 
 server:
-  port: 3006
+  port: ${SERVER_PORT:3006}
+  servlet:
+    context-path: ${SERVER_SERVLET_CONTEXT_PATH:}
   error:
     whitelabel:
       enabled: false
