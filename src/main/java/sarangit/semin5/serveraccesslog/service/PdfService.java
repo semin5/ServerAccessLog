@@ -16,6 +16,7 @@ import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.font.PDType0Font;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
+import org.apache.pdfbox.util.Matrix;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import sarangit.semin5.serveraccesslog.domain.AccessLog;
@@ -76,6 +77,8 @@ public class PdfService {
                     true,
                     true
             )) {
+                // 새 신청서 양식의 입력 영역에 맞춰 입력값과 서명을 함께 소폭 이동한다.
+                content.transform(Matrix.getTranslateInstance(-8, 17));
                 drawValues(content, font, companyName, visitorName, birthDate, visitedAt, exitedAt, contentText);
                 drawSignature(content, signature);
             }

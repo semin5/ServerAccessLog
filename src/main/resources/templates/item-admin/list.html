@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>관리자 - 물품 관리대장</title><link rel="stylesheet" th:href="@{/css/app.css(v=2026092202)}"></head>
+<body><main class="page-shell wide">
+    <header class="top-bar"><div><p class="eyebrow">Item Register</p><h1>물품 관리대장 기록</h1></div><div class="header-actions"><a class="button-link secondary" th:href="@{/}">처음으로</a><a class="button-link secondary" th:href="@{/item-register}">작성 화면</a></div></header>
+    <form class="filter-bar item-filter-bar" th:action="@{/item-register/admin}" method="get">
+        <label><span>이날부터</span><input type="date" name="startDate" th:value="${#temporals.format(startDate, 'yyyy-MM-dd')}"></label>
+        <label><span>이날까지</span><input type="date" name="endDate" th:value="${#temporals.format(endDate, 'yyyy-MM-dd')}"></label>
+        <label><span>물품명</span><select name="itemName"><option value="">전체</option><option th:each="name : ${itemNames}" th:value="${name}" th:text="${name}" th:selected="${name == itemName}"></option></select></label>
+        <label><span>담당자</span><select name="managerName"><option value="">전체</option><option th:each="manager : ${managerNames}" th:value="${manager}" th:text="${#strings.arraySplit(manager, ' ')[0]}" th:selected="${manager == managerName}"></option></select></label>
+        <label><span>대여 여부</span><select name="rental"><option value="" th:selected="${rental == null}">전체</option><option value="true" th:selected="${rental != null && rental}">대여</option><option value="false" th:selected="${rental != null && !rental}">비대여</option></select></label>
+        <button type="submit">조회</button>
+    </form>
+    <p class="notice" th:if="${message}" th:text="${message}"></p>
+    <section class="table-wrap"><table class="admin-table compact-table item-table">
+        <colgroup><col class="col-id"><col class="col-date"><col class="col-visitor"><col class="col-item"><col class="col-manager"><col class="col-reason"><col class="col-actions"></colgroup>
+        <thead><tr><th>번호</th><th>일자</th><th>수령인</th><th>물품</th><th>담당자</th><th>사유</th><th>관리</th></tr></thead>
+        <tbody>
+        <tr th:if="${#lists.isEmpty(itemLogs)}"><td colspan="7" class="empty">저장된 기록이 없습니다.</td></tr>
+        <tr th:each="log : ${itemLogs}">
+            <td th:text="${log.id}"></td><td th:text="${#temporals.format(log.receivedDate, 'yyyy-MM-dd')}"></td>
+            <td><div class="visitor-cell"><span class="visitor-name" th:text="${log.recipientName}"></span><button class="detail-button" type="button" th:attr="data-modal-target=${'recipientModal-' + log.id}">자세히</button></div></td>
+            <td><div class="visitor-cell"><span class="visitor-name" th:text="${log.itemName}"></span><div class="item-detail-actions"><button class="detail-button" type="button" th:attr="data-modal-target=${'productModal-' + log.id}">자세히</button><span class="rental-badge" th:classappend="${log.returnedAt != null ? 'rental-badge--returned' : ''}" th:if="${log.rental}" th:text="${log.returnedAt != null ? '반납' : '대여'}">대여</span></div></div></td>
+            <td>
+                <div class="checkout-done" th:if="${log.confirmedAt != null}"><span th:text="${#strings.arraySplit(log.managerName, ' ')[0]}"></span><form th:if="${log.rental && log.returnedAt == null}" th:action="@{/item-register/admin/{id}/return(id=${log.id})}" method="post"><button class="table-action" type="submit">반납</button></form></div>
+                <form class="checkout-form" th:if="${log.confirmedAt == null}" th:action="@{/item-register/admin/{id}/confirm(id=${log.id})}" method="post"><select name="managerName" required><option value="">담당자 선택</option><option th:each="manager : ${managerNames}" th:value="${manager}" th:text="${#strings.arraySplit(manager, ' ')[0]}"></option></select><button type="submit">담당자 확인</button></form>
+            </td>
+            <td class="content-cell" th:text="${log.reason}"></td>
+            <td><div class="table-actions"><a class="table-action" th:href="@{/item-register/admin/{id}/edit(id=${log.id})}">수정</a><button class="table-action confirmation-preview-button" type="button" th:data-pdf-preview-url="@{/item-register/admin/{id}/pdf(id=${log.id})}" th:data-pdf-print-url="@{/item-register/admin/{id}/pdf(id=${log.id},download=true)}">신청서 출력</button></div></td>
+        </tr></tbody>
+    </table></section>
+
+    <div class="visitor-modal" th:each="log : ${itemLogs}" th:id="${'recipientModal-' + log.id}" aria-hidden="true"><div class="visitor-modal__backdrop" data-modal-close></div><section class="visitor-modal__panel" role="dialog" aria-modal="true"><div class="visitor-modal__header"><h2>수령인 상세</h2><button class="modal-close-button" type="button" data-modal-close aria-label="닫기">×</button></div><dl class="detail-list"><div><dt>부서</dt><dd th:text="${log.recipientDepartment}"></dd></div><div><dt>성명</dt><dd th:text="${log.recipientName}"></dd></div><div><dt>서명</dt><dd><img class="modal-signature" th:src="@{/item-register/admin/{id}/signature(id=${log.id})}" alt="서명"></dd></div></dl></section></div>
+
+    <div class="visitor-modal" th:each="log : ${itemLogs}" th:id="${'productModal-' + log.id}" aria-hidden="true"><div class="visitor-modal__backdrop" data-modal-close></div><section class="visitor-modal__panel" role="dialog" aria-modal="true"><div class="visitor-modal__header"><h2>물품 상세</h2><button class="modal-close-button" type="button" data-modal-close aria-label="닫기">×</button></div><dl class="detail-list"><div><dt>물품명</dt><dd th:text="${log.itemName}"></dd></div><div><dt>수량</dt><dd th:text="${log.quantity}"></dd></div><div><dt>자산번호</dt><dd th:text="${log.assetNumber}"></dd></div><div><dt>대여 여부</dt><dd th:text="${log.rental ? 'Y' : 'N'}"></dd></div><div th:if="${log.returnedAt != null}"><dt>반납시간</dt><dd th:text="${#temporals.format(log.returnedAt, 'yyyy-MM-dd HH:mm')}"></dd></div><div><dt>비고</dt><dd><form class="remarks-form" th:action="@{/item-register/admin/{id}/remarks(id=${log.id})}" method="post"><textarea name="remarks" rows="3" maxlength="2000" th:text="${log.remarks}" placeholder="비고를 입력하세요."></textarea><button class="table-action" type="submit">비고 저장</button></form></dd></div></dl></section></div>
+
+    <div class="visitor-modal" id="confirmationPreviewModal" aria-hidden="true"><div class="visitor-modal__backdrop" data-modal-close></div><section class="visitor-modal__panel pdf-preview-panel" role="dialog" aria-modal="true"><div class="visitor-modal__header"><h2 id="confirmationPreviewTitle">신청서 미리보기</h2><button class="modal-close-button" type="button" data-modal-close aria-label="닫기">×</button></div><iframe class="pdf-preview-frame" id="confirmationPreviewFrame" title="신청서 미리보기"></iframe><div class="actions split"><button class="button-link secondary" type="button" data-modal-close>취소</button><button class="button-link" type="button" id="printConfirmationPdf">출력</button></div></section></div>
+</main><script th:src="@{/js/admin-list.js(v=2026092101)}"></script></body></html>

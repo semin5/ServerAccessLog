@@ -5,6 +5,110 @@
     background: #f4f7f4;
 }
 
+.field-label-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.rental-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.rental-toggle input {
+    width: auto;
+    margin: 0;
+}
+
+.item-table {
+    min-width: 1160px;
+}
+
+.item-table .col-item {
+    width: 165px;
+}
+
+.item-table .col-manager {
+    width: 136px;
+}
+
+.item-table th:nth-child(5),
+.item-table td:nth-child(5) {
+    padding-inline: 7px;
+}
+
+.item-table .checkout-done {
+    min-width: 0;
+}
+
+.item-table .checkout-done .table-action {
+    width: 122px;
+    min-height: 36px;
+    border: 0;
+    background: #176c5f;
+    color: #ffffff;
+}
+
+.item-table .col-reason {
+    width: 235px;
+}
+
+.item-detail-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.rental-badge {
+    color: #176c5f;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.rental-badge--returned {
+    color: #2563eb;
+}
+
+.filter-bar.item-filter-bar {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+}
+
+.item-filter-bar label {
+    min-width: 0;
+}
+
+.item-filter-bar button[type="submit"] {
+    width: 100%;
+    padding-inline: 14px;
+}
+
+.remarks-form {
+    display: grid;
+    gap: 6px;
+    min-width: 150px;
+}
+
+.remarks-form textarea {
+    min-height: 58px;
+    resize: vertical;
+}
+
+.rental-action {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.rental-action form {
+    margin: 0;
+}
+
 * {
     box-sizing: border-box;
 }
@@ -254,6 +358,25 @@ h2 {
     gap: 18px;
 }
 
+.department-field { display: grid; gap: 8px; position: relative; min-width: 0; }
+.department-field > label { display: block; color: #3f4b5b; font-size: 14px; font-weight: 800; cursor: pointer; }
+.department-picker-native { position: absolute !important; width: 1px !important; height: 1px !important; opacity: 0 !important; pointer-events: none !important; }
+.department-picker-trigger { width: 100%; border: 1px solid #cbd7d1; border-radius: 6px; background: #fbfdfc; color: #172033; font: inherit; font-size: 17px; padding: 13px 14px; text-align: left; }
+.department-picker-menu { position: absolute; top: 100%; left: 0; right: 0; z-index: 30; max-height: 300px; overflow: auto; padding: 6px; border: 1px solid #cbd7d1; border-radius: 6px; background: #fff; box-shadow: 0 10px 24px #0002; }
+.department-picker-menu[hidden] { display: none; }
+.department-picker-search { width: 100%; margin-bottom: 5px; padding: 8px 9px; font-size: 15px; }
+.department-picker-option { display: block; width: 100%; padding: 8px 10px; border: 0; border-radius: 5px; background: transparent; color: #172033; text-align: left; font: inherit; font-size: 15px; }
+.department-picker-option:hover, .department-picker-option.selected { background: #eef8f4; }
+.department-picker-group { border-top: 1px solid #e2e9e5; margin-top: 4px; }
+.department-picker-group summary { padding: 9px 10px; color: #172033; cursor: pointer; font-size: 15px; font-weight: 400; }
+.department-picker-group summary { list-style: none; }
+.department-picker-group summary::-webkit-details-marker { display: none; }
+.department-picker-group summary::before { content: '▸'; display: inline-block; margin-right: 8px; color: #176c5f; }
+.department-picker-group[open] summary::before { transform: rotate(90deg); }
+.department-picker-group .department-picker-option { padding-left: 28px; }
+.department-picker-empty { margin: 8px; color: #657789; font-size: 15px; }
+input[list="itemNameOptions"]::-webkit-calendar-picker-indicator { display: none !important; }
+
 .form-alert {
     margin-bottom: 18px;
     border: 1px solid #f2b8b5;
@@ -339,7 +462,8 @@ label span,
 }
 
 input,
-textarea {
+textarea,
+.entry-form select {
     width: 100%;
     border: 1px solid #cbd7d1;
     border-radius: 6px;
@@ -907,5 +1031,9 @@ th {
     .button-link,
     button[type="submit"] {
         width: 100%;
+    }
+
+    .filter-bar.item-filter-bar {
+        grid-template-columns: 1fr;
     }
 }

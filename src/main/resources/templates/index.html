@@ -3,20 +3,23 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>IT팀 서버·통신실 출입통제</title>
+    <title>IT팀 관리대장</title>
     <link rel="stylesheet" th:href="@{/css/app.css(v=2026062204)}">
 </head>
 <body>
 <main class="page-shell compact">
     <section class="selection-panel">
-        <p class="eyebrow">Access Register</p>
-        <h1>IT팀 서버·통신실 출입통제</h1>
+        <p class="eyebrow">Register</p>
+        <h1>IT팀 관리대장</h1>
         <div class="register-choice-grid">
             <a class="register-choice" th:href="@{/server-access}">
                 <span>출입 관리대장</span>
             </a>
             <a class="register-choice" th:href="@{/server-carry}">
                 <span>장비 반출·입 관리대장</span>
+            </a>
+            <a class="register-choice" th:href="@{/item-register}">
+                <span>물품 관리대장</span>
             </a>
         </div>
         <p class="index-footnote">Effective July 10, 2026 · Developed by IT team 오세민</p>

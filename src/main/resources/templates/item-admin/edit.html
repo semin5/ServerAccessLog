@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>물품 관리대장 수정</title><link rel="stylesheet" th:href="@{/css/app.css(v=2026092204)}"></head>
+<body><main class="page-shell">
+    <header class="top-bar"><div><p class="eyebrow">Item Register</p><h1>물품 관리대장 수정</h1></div><a class="button-link secondary" th:href="@{/item-register/admin}">목록</a></header>
+    <form class="entry-form" th:action="@{/item-register/admin/{id}/edit(id=${itemLog.id})}" th:object="${itemLogForm}" method="post">
+        <div class="form-alert" th:if="${#fields.hasGlobalErrors()}"><p th:each="error : ${#fields.globalErrors()}" th:text="${error}"></p></div>
+        <div class="form-grid">
+            <label><span>일자</span><input type="date" th:field="*{receivedDate}"><small th:errors="*{receivedDate}"></small></label>
+            <label><span class="field-label-row"><span>성명</span><span class="rental-toggle"><input type="checkbox" th:field="*{rental}"><span>대여</span></span></span><input th:field="*{recipientName}"><small th:errors="*{recipientName}"></small></label>
+            <div class="department-field"><label for="recipientDepartment">부서</label><select th:field="*{recipientDepartment}" required><option value="">부서 선택</option><option th:each="department : ${departmentOptions}" th:value="${department.name}" th:text="${department.name}" th:attr="data-middle-category=${department.middleCategory}"></option></select><small th:errors="*{recipientDepartment}"></small></div>
+            <label><span>물품</span><input th:field="*{itemName}" list="itemNameOptions"><datalist id="itemNameOptions"><option th:each="name : ${itemNames}" th:value="${name}"></option></datalist><small th:errors="*{itemName}"></small></label>
+            <label><span>수량</span><input type="number" min="1" th:field="*{quantity}"><small th:errors="*{quantity}"></small></label>
+            <label><span>자산번호</span><input th:field="*{assetNumber}"><small th:errors="*{assetNumber}"></small></label>
+        </div>
+        <label class="wide-field"><span>사유</span><textarea th:field="*{reason}" rows="5"></textarea><small th:errors="*{reason}"></small></label>
+        <section class="signature-panel"><div class="section-heading"><h2>서명</h2><button class="icon-button" type="button" id="clearSignature" aria-label="새 서명 지우기">↺</button></div><div class="current-signature"><span>현재 서명</span><img th:src="@{/item-register/admin/{id}/signature(id=${itemLog.id})}" alt="현재 서명"></div><canvas id="signatureCanvas" width="900" height="320"></canvas><input type="hidden" th:field="*{signatureData}" id="signatureData"><small>새 서명을 입력하지 않으면 기존 서명이 유지됩니다.</small></section>
+        <div class="actions split"><a class="button-link secondary" th:href="@{/item-register/admin}">취소</a><button type="submit">저장</button></div>
+    </form>
+</main><script th:src="@{/js/signature.js(v=2026092101)}"></script><script th:src="@{/js/department-picker.js(v=2026092202)}"></script></body></html>

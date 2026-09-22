@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>물품 관리대장</title>
+    <link rel="stylesheet" th:href="@{/css/app.css(v=2026092204)}">
+</head>
+<body>
+<main class="page-shell">
+    <header class="top-bar">
+        <div><p class="eyebrow">Item Register</p><h1>물품 관리대장</h1></div>
+        <div class="header-actions"><a class="button-link secondary" th:href="@{/}">처음으로</a><a class="button-link" th:href="@{/item-register/admin}">관리자</a></div>
+    </header>
+    <form class="entry-form" th:action="@{/item-register/logs}" th:object="${itemLogForm}" method="post">
+        <div class="form-alert" th:if="${#fields.hasGlobalErrors()}"><p th:each="error : ${#fields.globalErrors()}" th:text="${error}"></p></div>
+        <div class="form-grid">
+            <label><span>일자</span><input type="date" th:field="*{receivedDate}"><small th:errors="*{receivedDate}"></small></label>
+            <label><span class="field-label-row"><span>성명</span><span class="rental-toggle"><input type="checkbox" th:field="*{rental}"><span>대여</span></span></span><input th:field="*{recipientName}" autocomplete="name"><small th:errors="*{recipientName}"></small></label>
+            <div class="department-field"><label for="recipientDepartment">부서</label><select th:field="*{recipientDepartment}" required><option value="">부서 선택</option><option th:each="department : ${departmentOptions}" th:value="${department.name}" th:text="${department.name}" th:attr="data-middle-category=${department.middleCategory}"></option></select><small th:errors="*{recipientDepartment}"></small></div>
+            <label><span>물품</span><input th:field="*{itemName}" list="itemNameOptions" autocomplete="off"><datalist id="itemNameOptions"><option th:each="name : ${itemNames}" th:value="${name}"></option></datalist><small th:errors="*{itemName}"></small></label>
+            <label><span>수량</span><input type="number" min="1" th:field="*{quantity}"><small th:errors="*{quantity}"></small></label>
+            <label><span>자산번호</span><input th:field="*{assetNumber}"><small th:errors="*{assetNumber}"></small></label>
+        </div>
+        <label class="wide-field"><span>사유</span><textarea th:field="*{reason}" rows="5"></textarea><small th:errors="*{reason}"></small></label>
+        <section class="signature-panel">
+            <div class="section-heading"><h2>서명</h2><button class="icon-button" type="button" id="clearSignature" aria-label="서명 지우기">↺</button></div>
+            <canvas id="signatureCanvas" width="900" height="320"></canvas>
+            <input type="hidden" th:field="*{signatureData}" id="signatureData"><small th:errors="*{signatureData}"></small>
+        </section>
+        <section class="consent-panel">
+            <small th:errors="*{privacyAgreed}"></small>
+            <details><summary>개인정보 수집 및 이용 동의 조항 보기</summary><div class="terms-box">
+                <p>수집 항목: 수령인, 수령부서, 물품 정보, 사유, 서명</p>
+                <p>수집 목적: 물품 지급 및 대여·반납 이력 관리</p>
+                <p>보관 기간: 회사 내부 정책에 따른 보관 기간 동안 보관 후 파기</p>
+                <p>동의를 거부할 수 있으나, 동의하지 않을 경우 물품 기록 등록이 제한될 수 있습니다.</p>
+            </div></details>
+            <label class="check-line"><input type="checkbox" th:field="*{privacyAgreed}" id="privacyAgreed"><span>개인정보 수집 및 이용에 동의합니다.</span></label>
+        </section>
+        <div class="actions right"><button class="entry-submit" type="submit" id="submitEntry" disabled>저장</button></div>
+    </form>
+</main>
+<script th:src="@{/js/signature.js(v=2026092101)}"></script>
+<script th:src="@{/js/department-picker.js(v=2026092202)}"></script>
+</body></html>

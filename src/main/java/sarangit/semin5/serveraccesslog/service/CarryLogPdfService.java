@@ -16,6 +16,7 @@ import org.apache.pdfbox.pdmodel.PDPageContentStream.AppendMode;
 import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.font.PDType0Font;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
+import org.apache.pdfbox.util.Matrix;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import sarangit.semin5.serveraccesslog.domain.CarryLog;
@@ -34,6 +35,8 @@ public class CarryLogPdfService {
             PDPage page = document.getPage(0);
 
             try (PDPageContentStream content = new PDPageContentStream(document, page, AppendMode.APPEND, true, true)) {
+                // 새 신청서 양식의 입력 영역에 맞춰 입력값과 서명을 함께 소폭 이동한다.
+                content.transform(Matrix.getTranslateInstance(-10, 14));
                 drawDocument(document, content, font, log);
             }
 
