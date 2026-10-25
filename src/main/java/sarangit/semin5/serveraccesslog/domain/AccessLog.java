@@ -47,12 +47,10 @@ public class AccessLog {
     @Column(length = 100)
     private String signatureContentType;
 
-    @Lob
-    @Column(nullable = false, columnDefinition = "LONGBLOB")
+    @Column(nullable = false, columnDefinition = "bytea")
     private byte[] signatureImage;
 
-    @Lob
-    @Column(nullable = false, columnDefinition = "LONGBLOB")
+    @Column(nullable = false, columnDefinition = "bytea")
     private byte[] pdfFile;
 
     @Column

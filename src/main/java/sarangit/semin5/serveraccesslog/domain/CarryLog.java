@@ -62,8 +62,7 @@ public class CarryLog {
     @Column(length = 100)
     private String signatureContentType;
 
-    @Lob
-    @Column(nullable = false, columnDefinition = "LONGBLOB")
+    @Column(nullable = false, columnDefinition = "bytea")
     private byte[] signatureImage;
 
     @Column(nullable = false, updatable = false)
